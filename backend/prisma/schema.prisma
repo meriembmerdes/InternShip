@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  SUPERVISOR
+  COMPANY
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum InternshipStatus {
+  BROUILLON
+  PUBLIEE
+  FERMEE
+  TERMINEE
+}
+
+enum ApplicationStatus {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+  ANNULEE
+}
+
+enum StageStatus {
+  EN_ATTENTE
+  EN_COURS
+  TERMINE
+  SUSPENDU
+}
+
+enum ReportStatus {
+  NON_DEPOSE
+  DEPOSE
+  EN_REVISION
+  VALIDE
+  REFUSE
+}
+
+enum EvaluationStatus {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+}
+
+enum NotificationType {
+  INFORMATION
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      Role
+  isActive  UserStatus @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  student    Student?
+  supervisor Supervisor?
+  company    Company?
+  notifications Notification[]
+}
+
+model Student {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  firstName   String
+  lastName    String
+  phone       String?
+  institution String?
+  specialty   String?
+  level       String?
+  bio         String?
+  cvUrl       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications        Application[]
+  reports             Report[]
+  stages              Stage[]
+  skillLinks          StudentSkill[]
+  evaluations         StudentEvaluation[]
+}
+
+model Supervisor {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  firstName  String
+  lastName   String
+  profession String?
+  department String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internships Internship[]
+  stages     Stage[]
+  evaluations SupervisorEvaluation[]
+}
+
+model Company {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  managerName  String
+  companyName  String
+  sector       String?
+  address      String?
+  phone        String?
+  managerTitle String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internships Internship[]
+  stages     Stage[]
+  evaluations CompanyEvaluation[]
+}
+
+model Skill {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+
+  studentLinks    StudentSkill[]
+  internshipLinks InternshipSkill[]
+}
+
+model StudentSkill {
+  id        String @id @default(uuid())
+  studentId String
+  skillId   String
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, skillId])
+}
+
+model Internship {
+  id             String           @id @default(uuid())
+  title          String
+  description    String
+  domain         String
+  duration       String?
+  location       String?
+  startDate      DateTime?
+  endDate        DateTime?
+  numberOfPlaces Int              @default(1)
+  publishedAt    DateTime?
+  status         InternshipStatus @default(BROUILLON)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  companyId    String?
+  supervisorId String?
+  company      Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  supervisor   Supervisor? @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+  applications Application[]
+  stages       Stage[]
+  skillLinks   InternshipSkill[]
+}
+
+model InternshipSkill {
+  id          String @id @default(uuid())
+  internshipId String
+  skillId     String
+
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  skill      Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([internshipId, skillId])
+}
+
+model Application {
+  id                String           @id @default(uuid())
+  studentId         String
+  internshipId      String
+  motivationMessage String?
+  cvUrl             String?
+  status            ApplicationStatus @default(EN_ATTENTE)
+  appliedAt         DateTime         @default(now())
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, internshipId])
+}
+
+model Stage {
+  id           String      @id @default(uuid())
+  studentId    String
+  companyId    String?
+  supervisorId String?
+  internshipId String
+  startDate    DateTime?
+  endDate      DateTime?
+  status       StageStatus @default(EN_ATTENTE)
+  progression  Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  student      Student               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  company      Company?              @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  supervisor   Supervisor?           @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+  internship   Internship            @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  reports      Report[]
+  evaluations  CompanyEvaluation[]
+  studentEval  StudentEvaluation[]
+  supervisorEval SupervisorEvaluation[]
+}
+
+model Report {
+  id          String      @id @default(uuid())
+  stageId     String
+  studentId   String
+  fileUrl     String
+  submittedAt DateTime?
+  status      ReportStatus @default(DEPOSE)
+  comment     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  stage   Stage   @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model CompanyEvaluation {
+  id        String           @id @default(uuid())
+  stageId   String
+  authorId  String
+  type      String           @default("COMPANY_TO_STUDENT")
+  criteria  Json
+  comment   String?
+  status    EvaluationStatus @default(EN_ATTENTE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  stage  Stage   @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  author Company @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model StudentEvaluation {
+  id        String           @id @default(uuid())
+  stageId   String
+  authorId  String
+  type      String           @default("STUDENT_TO_COMPANY")
+  criteria  Json
+  comment   String?
+  status    EvaluationStatus @default(EN_ATTENTE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  stage  Stage   @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  author Student @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model SupervisorEvaluation {
+  id        String           @id @default(uuid())
+  stageId   String
+  authorId  String
+  type      String           @default("SUPERVISOR_TO_STUDENT")
+  criteria  Json
+  comment   String?
+  status    EvaluationStatus @default(EN_ATTENTE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  stage   Stage      @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  author  Supervisor @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String          @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType @default(INFORMATION)
+  isRead    Boolean         @default(false)
+  createdAt DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
