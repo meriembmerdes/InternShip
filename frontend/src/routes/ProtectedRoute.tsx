@@ -1,25 +1,20 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Navigate, Outlet } from 'react-router-dom';
 
 interface ProtectedRouteProps {
-    allowedRoles?: Array<'ADMIN' | 'STUDENT' | 'SUPERVISOR' | 'COMPANY'>;
+  allowedRoles: string[];
+  children?: React.ReactNode;
 }
 
-export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-const { isAuthenticated, user, isLoading } = useAuth();
-const location = useLocation();
+export default function ProtectedRoute({ allowedRoles, children }: ProtectedRouteProps) {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-if (isLoading) {
-    return <div className="page-shell centered">Chargement de la session…</div>;
-}
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
-if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-}
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
 
-if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={`/${user.role.toLowerCase()}/dashboard`} replace />;
-}
-
-return <Outlet />;
+  return children ? <>{children}</> : <Outlet />;
 }

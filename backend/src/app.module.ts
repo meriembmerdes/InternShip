@@ -6,6 +6,10 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { InternshipsModule } from './internships/internships.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
+import { ProfileModule } from './profile/profile.module.js';
+import { ApplicationsModule } from './applications/applications.module.js';
+import { StagesModule } from './stages/stages.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -14,6 +18,10 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
     AuthModule,
     InternshipsModule,
     DashboardModule,
+    ProfileModule,
+    ApplicationsModule,
+    StagesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

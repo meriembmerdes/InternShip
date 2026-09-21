@@ -1,12 +1,19 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './routes/ProtectedRoute';
+import ProtectedRoute from './routes/ProtectedRoute';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import MyApplicationsPage from './pages/student/ApplicationsPage';
+import InternshipsPage from './pages/student/InternshipPage';
+import InternshipDetailsPage from './pages/student/InternshipDetailsPage';
+import CompanyApplicationsPage from './pages/company/ApplicationsPage';
+import SupervisorApplicationsPage from './pages/supervisor/ApplicationsPage';
 
 import './App.css';
+import ProfilePage from './pages/ProfilePage';
+import ApplicationsPage from './pages/supervisor/ApplicationsPage';
 
 function ComingSoonPage() {
   return (
@@ -57,23 +64,26 @@ export default function App() {
 
             <Route
               path="/student/profile"
-              element={<ComingSoonPage />}
+              element={<ProfilePage />}
             />
 
             <Route
               path="/student/internships"
-              element={<ComingSoonPage />}
+              element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+            <InternshipsPage />
+            </ProtectedRoute>
+              }
             />
 
-            <Route
-              path="/student/applications"
-              element={<ComingSoonPage />}
-            />
+            <Route path="/student/internships/:id"
+            element={<ProtectedRoute allowedRoles={['STUDENT']}>
+              <InternshipDetailsPage/></ProtectedRoute>}
+              />
 
-            <Route
-              path="/student/stages"
-              element={<ComingSoonPage />}
-            />
+            <Route path="/student/applications" 
+            element={<ProtectedRoute allowedRoles={['STUDENT']}>
+              <ApplicationsPage/></ProtectedRoute>}/>
 
             <Route
               path="/student/notifications"
@@ -94,13 +104,15 @@ export default function App() {
 
             <Route
               path="/supervisor/profile"
-              element={<ComingSoonPage />}
+              element={<ProfilePage />}
             />
 
             <Route
               path="/supervisor/students"
               element={<ComingSoonPage />}
             />
+            <Route path="/supervisor/applications" 
+            element={<SupervisorApplicationsPage/>}/>
 
             <Route
               path="/supervisor/stages"
@@ -131,7 +143,7 @@ export default function App() {
 
             <Route
               path="/company/profile"
-              element={<ComingSoonPage />}
+              element={<ProfilePage />}
             />
 
             <Route
@@ -139,10 +151,8 @@ export default function App() {
               element={<ComingSoonPage />}
             />
 
-            <Route
-              path="/company/applications"
-              element={<ComingSoonPage />}
-            />
+            <Route path="/company/applications" 
+            element={<CompanyApplicationsPage/>}/>
 
             <Route
               path="/company/stages"

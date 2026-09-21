@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import RoleNavigation from '../components/RoleNavigation';
 import {dashboardService,type DashboardStats,} from '../services/dashboard.service';
+import { useNavigate } from 'react-router-dom';
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -11,6 +12,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
 
   const role = user?.role;
+  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
@@ -171,6 +173,9 @@ export default function DashboardPage() {
                   {stats.notificationsCount}
                 </strong>
               </div>
+              <button onClick={() =>navigate('/student/applications')}
+              className="rounded-xl border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50">
+                📄 Mes candidatures</button>
             </>
           ) : null}
 
@@ -203,7 +208,13 @@ export default function DashboardPage() {
                   {stats.notificationsCount}
                 </strong>
               </div>
+              <button onClick={() =>navigate('/student/internships')
+                  }className="rounded-lg bg-blue-600 px-5 py-3 text-white">
+                Consulter les offres de stage</button>
+                <button onClick={()=>navigate('/company/applications')} className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700">
+                  📄 Candidatures reçues</button>
             </>
+            
           ) : null}
 
           {stats.role === 'SUPERVISOR' ? (
@@ -235,6 +246,8 @@ export default function DashboardPage() {
                   {stats.notificationsCount}
                 </strong>
               </div>
+              <button onClick={()=>navigate('/supervisor/applications')} className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700">
+                📄 Candidatures reçues</button>
             </>
           ) : null}
 
