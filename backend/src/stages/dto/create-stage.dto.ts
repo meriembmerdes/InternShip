@@ -1,26 +1,39 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { StageStatus } from '@prisma/client';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateStageDto {
-  @ApiProperty({
-    description: 'ID de la candidature acceptée',
-  })
+  @ApiProperty()
   @IsString()
-  applicationId: string;
+  studentId: string;
 
-  @ApiProperty({
-    required: false,
-    description: 'Date de début du stage',
-  })
+  @ApiProperty()
+  @IsString()
+  internshipId: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  companyId?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  supervisorId?: string;
+
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
   startDate?: string;
 
-  @ApiProperty({
-    required: false,
-    description: 'Date de fin du stage',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
   endDate?: string;
+
+  @ApiProperty({ required: false, enum: StageStatus })
+  @IsOptional()
+  @IsEnum(StageStatus)
+  status?: StageStatus;
 }
+

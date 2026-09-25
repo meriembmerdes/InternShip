@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
   profileService,
@@ -25,37 +25,45 @@ export default function ProfilePage() {
 
         setProfile(data);
 
+        if (data.role === 'ADMIN') {
+          setForm({
+          firstName: data.firstName ?? '',
+          lastName: data.lastName ?? '',
+          }); 
+        }
+
         if (data.student) {
           setForm({
-            firstName: data.student.firstName ?? '',
-            lastName: data.student.lastName ?? '',
-            phone: data.student.phone ?? '',
-            institution: data.student.institution ?? '',
-            specialty: data.student.specialty ?? '',
-            level: data.student.level ?? '',
-            bio: data.student.bio ?? '',
+          firstName: data.student.firstName ?? '',
+          lastName: data.student.lastName ?? '',
+          phone: data.student.phone ?? '',
+          institution: data.student.institution ?? '',
+          specialty: data.student.specialty ?? '',
+          level: data.student.level ?? '',
+          bio: data.student.bio ?? '',
           });
         }
 
         if (data.supervisor) {
           setForm({
-            firstName: data.supervisor.firstName ?? '',
-            lastName: data.supervisor.lastName ?? '',
-            profession: data.supervisor.profession ?? '',
-            department: data.supervisor.department ?? '',
+          firstName: data.supervisor.firstName ?? '',
+          lastName: data.supervisor.lastName ?? '',
+          profession: data.supervisor.profession ?? '',
+          department: data.supervisor.department ?? '',
           });
         }
 
         if (data.company) {
           setForm({
-            managerName: data.company.managerName ?? '',
-            companyName: data.company.companyName ?? '',
-            sector: data.company.sector ?? '',
-            address: data.company.address ?? '',
-            phone: data.company.phone ?? '',
-            managerTitle: data.company.managerTitle ?? '',
+          managerName: data.company.managerName ?? '',
+          companyName: data.company.companyName ?? '',
+          sector: data.company.sector ?? '',
+          address: data.company.address ?? '',
+          phone: data.company.phone ?? '',
+          managerTitle: data.company.managerTitle ?? '',
           });
         }
+
       } catch (err: any) {
         setError(
           err?.response?.data?.message ||
@@ -91,31 +99,43 @@ export default function ProfilePage() {
     setError('');
 
     try {
-      if (profile.role === 'STUDENT') {
-        await profileService.updateStudent(form);
-      }
+  if (profile.role === 'ADMIN') {
+    await profileService.updateAdmin(form);
+  }
 
-      if (profile.role === 'SUPERVISOR') {
-        await profileService.updateSupervisor(form);
-      }
+  if (profile.role === 'STUDENT') {
+    await profileService.updateStudent(form);
+  }
 
-      if (profile.role === 'COMPANY') {
-        await profileService.updateCompany(form);
-      }
+  if (profile.role === 'SUPERVISOR') {
+    await profileService.updateSupervisor(form);
+  }
 
-      setMessage('Profil mis à jour avec succès.');
+  if (profile.role === 'COMPANY') {
+    await profileService.updateCompany(form);
+  }
 
-      const updated = await profileService.getMyProfile();
-      setProfile(updated);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          'Impossible de mettre à jour le profil.',
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const updated = await profileService.getMyProfile();
+
+  setProfile(updated);
+
+  if (updated.role === 'ADMIN') {
+    setForm({
+      firstName: updated.firstName ?? '',
+      lastName: updated.lastName ?? '',
+    });
+  }
+
+  setMessage('Profil mis à jour avec succès.');
+} catch (err: any) {
+  setError(
+    err?.response?.data?.message ||
+      'Impossible de mettre à jour le profil.',
+  );
+} finally {
+  setIsSaving(false);
+}
+}
 
   if (isLoading) {
     return (
@@ -209,6 +229,14 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+        {profile.role === 'ADMIN' ? (
+          <div className="form-section">
+            <h2>Informations administrateur</h2>
+
+            {renderField('Prénom', 'firstName')}  
+            {renderField('Nom', 'lastName')}
+          </div>
+        ) : null}
 
         {profile.role === 'STUDENT' ? (
           <div className="form-section">
@@ -248,22 +276,15 @@ export default function ProfilePage() {
           </div>
         ) : null}
 
-        {profile.role !== 'ADMIN' ? (
-          <button
-            className="primary-button"
-            type="submit"
-            disabled={isSaving}
-          >
-            {isSaving
-              ? 'Enregistrement…'
-              : 'Enregistrer les modifications'}
-          </button>
-        ) : (
-          <div className="message">
-            Le profil administrateur est géré par
-            l’administration.
-          </div>
-        )}
+        <button
+  className="primary-button"
+  type="submit"
+  disabled={isSaving}
+>
+  {isSaving
+    ? 'Enregistrement…'
+    : 'Enregistrer les modifications'}
+</button>
       </form>
     </div>
   );

@@ -1,18 +1,65 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import RoleNavigation from '../components/RoleNavigation';
-import {dashboardService,type DashboardStats,} from '../services/dashboard.service';
+
+import {
+  dashboardService,
+  type DashboardStats,
+} from '../services/dashboard.service';
 import { useNavigate } from 'react-router-dom';
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const role = user?.role;
   const navigate = useNavigate();
+  const role = user?.role;
+
+  const userData = user as any;
+
+const getUserName = () => {
+  if (!user) {
+    return 'Utilisateur';
+  }
+
+  // Nom directement présent dans AuthUser
+  if (user.firstName || user.lastName) {
+    return [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  // Étudiant
+  if (user.student) {
+    return [
+      user.student.firstName,
+      user.student.lastName,
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  // Encadrant
+  if (user.supervisor) {
+    return [
+      user.supervisor.firstName,
+      user.supervisor.lastName,
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  // Entreprise
+  if (user.company?.companyName) {
+    return user.company.companyName;
+  }
+
+  return 'Utilisateur';
+};
+
+const fullName = getUserName();
 
   useEffect(() => {
     let isMounted = true;
@@ -94,224 +141,235 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="page-shell">
-        <RoleNavigation />
-        <header className="topbar">
-        <div>
-          <p className="eyebrow">Tableau de bord</p>
+      <main className="dashboard-content">
+        <header className="dashboard-header">
+          <div>
+            <p className="eyebrow">TABLEAU DE BORD</p>
 
-          <h1>
-            Bienvenue, {user?.email ?? 'Utilisateur'}
-          </h1>
+            <h1>
+            Bienvenue,{' '}
+          {[
+            user?.firstName,
+            user?.lastName,
+            ]
+    .filter(Boolean)
+    .join(' ') || 'Utilisateur'} 👋
+</h1>
 
-          <p>{getTitle()}</p>
-        </div>
-
-        <button
-          className="secondary-button"
-          onClick={() => void logout()}
-        >
-          Déconnexion
-        </button>
-      </header>
-
-      {isLoading ? (
-        <div className="message">
-          Chargement des statistiques…
-        </div>
-      ) : null}
-
-      {error ? (
-        <div className="message error">
-          {error}
-        </div>
-      ) : null}
-
-      {!isLoading && !error && stats ? (
-        <div className="stats-grid">
-
-          <div className="stat-card">
-            <span>Rôle</span>
-            <strong>{role ?? 'NON_DÉFINI'}</strong>
+            <p className="dashboard-subtitle">
+              {getTitle()}
+            </p>
           </div>
+        </header>
 
-          {getProfileCompletion() !== null ? (
+        {isLoading && (
+          <div className="message">
+            Chargement des statistiques…
+          </div>
+        )}
+
+        {error && (
+          <div className="message error">
+            {error}
+          </div>
+        )}
+
+        {!isLoading && !error && stats && (
+          <div className="stats-grid">
+
             <div className="stat-card">
-              <span>Profil</span>
-              <strong>
-                {getProfileCompletion()}%
-              </strong>
+              <span>Rôle</span>
+              <strong>{role ?? 'NON_DÉFINI'}</strong>
             </div>
-          ) : null}
 
-          {stats.role === 'STUDENT' ? (
-            <>
+            {getProfileCompletion() !== null && (
               <div className="stat-card">
-                <span>Candidatures</span>
+                <span>Profil</span>
                 <strong>
-                  {stats.applicationsCount}
+                  {getProfileCompletion()}%
                 </strong>
               </div>
+            )}
 
-              <div className="stat-card">
-                <span>Candidatures acceptées</span>
-                <strong>
-                  {stats.acceptedApplicationsCount}
-                </strong>
-              </div>
+            {stats.role === 'STUDENT' && (
+              <>
+                <div className="stat-card">
+                  <span>Candidatures</span>
+                  <strong>
+                    {stats.applicationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Stages</span>
-                <strong>
-                  {stats.internshipsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Candidatures acceptées</span>
+                  <strong>
+                    {stats.acceptedApplicationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Notifications</span>
-                <strong>
-                  {stats.notificationsCount}
-                </strong>
-              </div>
-              <button onClick={() =>navigate('/student/applications')}
-              className="rounded-xl border border-slate-200 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50">
-                📄 Mes candidatures</button>
-            </>
-          ) : null}
+                <div className="stat-card">
+                  <span>Stages</span>
+                  <strong>
+                    {stats.internshipsCount}
+                  </strong>
+                </div>
 
-          {stats.role === 'COMPANY' ? (
-            <>
-              <div className="stat-card">
-                <span>Mes offres</span>
-                <strong>
-                  {stats.internshipsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Notifications</span>
+                  <strong>
+                    {stats.notificationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Candidatures reçues</span>
-                <strong>
-                  {stats.applicationsCount}
-                </strong>
-              </div>
+                <button
+                  onClick={() =>
+                    navigate('/student/applications')
+                  }
+                  className="primary-button"
+                >
+                  📄 Mes candidatures
+                </button>
+              </>
+            )}
 
-              <div className="stat-card">
-                <span>Candidatures acceptées</span>
-                <strong>
-                  {stats.acceptedApplicationsCount}
-                </strong>
-              </div>
+            {stats.role === 'COMPANY' && (
+              <>
+                <div className="stat-card">
+                  <span>Mes offres</span>
+                  <strong>
+                    {stats.internshipsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Notifications</span>
-                <strong>
-                  {stats.notificationsCount}
-                </strong>
-              </div>
-              <button onClick={() =>navigate('/student/internships')
-                  }className="rounded-lg bg-blue-600 px-5 py-3 text-white">
-                Consulter les offres de stage</button>
-                <button onClick={()=>navigate('/company/applications')} className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700">
-                  📄 Candidatures reçues</button>
-            </>
-            
-          ) : null}
+                <div className="stat-card">
+                  <span>Candidatures reçues</span>
+                  <strong>
+                    {stats.applicationsCount}
+                  </strong>
+                </div>
 
-          {stats.role === 'SUPERVISOR' ? (
-            <>
-              <div className="stat-card">
-                <span>Stages suivis</span>
-                <strong>
-                  {stats.supervisedInternshipsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Candidatures acceptées</span>
+                  <strong>
+                    {stats.acceptedApplicationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Étudiants suivis</span>
-                <strong>
-                  {stats.studentsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Notifications</span>
+                  <strong>
+                    {stats.notificationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Évaluations</span>
-                <strong>
-                  {stats.evaluationsCount}
-                </strong>
-              </div>
+                <button
+                  onClick={() =>
+                    navigate('/company/internships')
+                  }
+                  className="primary-button"
+                >
+                  Consulter mes offres
+                </button>
 
-              <div className="stat-card">
-                <span>Notifications</span>
-                <strong>
-                  {stats.notificationsCount}
-                </strong>
-              </div>
-              <button onClick={()=>navigate('/supervisor/applications')} className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700">
-                📄 Candidatures reçues</button>
-            </>
-          ) : null}
+                <button
+                  onClick={() =>
+                    navigate('/company/applications')
+                  }
+                  className="primary-button"
+                >
+                  📄 Candidatures reçues
+                </button>
+              </>
+            )}
 
-          {stats.role === 'ADMIN' ? (
-            <>
-              <div className="stat-card">
-                <span>Utilisateurs</span>
-                <strong>
-                  {stats.usersCount}
-                </strong>
-              </div>
+            {stats.role === 'SUPERVISOR' && (
+              <>
+                <div className="stat-card">
+                  <span>Stages suivis</span>
+                  <strong>
+                    {stats.supervisedInternshipsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Étudiants</span>
-                <strong>
-                  {stats.studentsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Étudiants suivis</span>
+                  <strong>
+                    {stats.studentsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Encadrants</span>
-                <strong>
-                  {stats.supervisorsCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Évaluations</span>
+                  <strong>
+                    {stats.evaluationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Entreprises</span>
-                <strong>
-                  {stats.companiesCount}
-                </strong>
-              </div>
+                <div className="stat-card">
+                  <span>Notifications</span>
+                  <strong>
+                    {stats.notificationsCount}
+                  </strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Offres / stages</span>
-                <strong>
-                  {stats.internshipsCount}
-                </strong>
-              </div>
+                <button
+                  onClick={() =>
+                    navigate('/supervisor/applications')
+                  }
+                  className="primary-button"
+                >
+                  📄 Candidatures
+                </button>
+              </>
+            )}
 
-              <div className="stat-card">
-                <span>Candidatures</span>
-                <strong>
-                  {stats.applicationsCount}
-                </strong>
-              </div>
+            {stats.role === 'ADMIN' && (
+              <>
+                <div className="stat-card">
+                  <span>Utilisateurs</span>
+                  <strong>{stats.usersCount}</strong>
+                </div>
 
-              <div className="stat-card">
-                <span>Notifications</span>
-                <strong>
-                  {stats.notificationsCount}
-                </strong>
-              </div>
-            </>
-          ) : null}
+                <div className="stat-card">
+                  <span>Étudiants</span>
+                  <strong>{stats.studentsCount}</strong>
+                </div>
 
-        </div>
-      ) : null}
+                <div className="stat-card">
+                  <span>Encadrants</span>
+                  <strong>{stats.supervisorsCount}</strong>
+                </div>
 
-      {!isLoading && !error && !stats ? (
-        <div className="message">
-          Aucune statistique disponible.
-        </div>
-      ) : null}
-    </div>
+                <div className="stat-card">
+                  <span>Entreprises</span>
+                  <strong>{stats.companiesCount}</strong>
+                </div>
+
+                <div className="stat-card">
+                  <span>Offres / stages</span>
+                  <strong>{stats.internshipsCount}</strong>
+                </div>
+
+                <div className="stat-card">
+                  <span>Candidatures</span>
+                  <strong>{stats.applicationsCount}</strong>
+                </div>
+
+                <div className="stat-card">
+                  <span>Notifications</span>
+                  <strong>{stats.notificationsCount}</strong>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {!isLoading && !error && !stats && (
+          <div className="message">
+            Aucune statistique disponible.
+          </div>
+        )}
+      </main>
+    
   );
 }

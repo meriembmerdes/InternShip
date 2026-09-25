@@ -38,6 +38,10 @@ export interface MyProfile {
   email: string;
   role: 'ADMIN' | 'STUDENT' | 'SUPERVISOR' | 'COMPANY';
   isActive: 'ACTIVE' | 'INACTIVE';
+
+  firstName?: string | null;
+  lastName?: string | null;
+
   student?: StudentProfile | null;
   supervisor?: SupervisorProfile | null;
   company?: CompanyProfile | null;
@@ -81,4 +85,17 @@ export const profileService = {
 
     return response.data;
   },
+  updateAdmin: async (
+  data: {
+    firstName?: string;
+    lastName?: string;
+  },
+): Promise<MyProfile> => {
+  const response = await api.put<MyProfile>(
+    '/profile/admin',
+    data,
+  );
+
+  return response.data;
+},
 };

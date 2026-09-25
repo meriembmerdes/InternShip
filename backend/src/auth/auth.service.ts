@@ -197,7 +197,8 @@ export class AuthService {
         student: true,
         supervisor: true,
         company: true,
-      },
+        admin: true,
+},
     });
 
     if (!user) {
@@ -212,32 +213,67 @@ export class AuthService {
   }
 
   private async buildAuthPayload(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      student: true,
+      supervisor: true,
+      company: true,
+    },
+  });
 
-    if (!user) {
-      throw new UnauthorizedException(
-        'Utilisateur introuvable.',
-      );
-    }
+  if (!user) {
+    throw new UnauthorizedException(
+      'Utilisateur introuvable.',
+    );
+  }
 
-    const payload = {
-      sub: user.id,
+  const payload = {
+    sub: user.id,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = await this.jwtService.signAsync(payload);
+
+  return {
+    accessToken,
+    user: {
+      id: user.id,
       email: user.email,
       role: user.role,
-    };
+      isActive: user.isActive,
 
-    const accessToken = await this.jwtService.signAsync(payload);
+      firstName:
+        user.student?.firstName ||
+        user.supervisor?.firstName ||
+        '',
 
-    return {
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        isActive: user.isActive,
-      },
-    };
-  }
+      lastName:
+        user.student?.lastName ||
+        user.supervisor?.lastName ||
+        '',
+
+      student: user.student
+        ? {
+            firstName: user.student.firstName,
+            lastName: user.student.lastName,
+          }
+        : undefined,
+
+      supervisor: user.supervisor
+        ? {
+            firstName: user.supervisor.firstName,
+            lastName: user.supervisor.lastName,
+          }
+        : undefined,
+
+      company: user.company
+        ? {
+            companyName: user.company.companyName,
+          }
+        : undefined,
+    },
+  };
+}
 }

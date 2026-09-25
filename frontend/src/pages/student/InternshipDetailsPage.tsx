@@ -1,61 +1,156 @@
-import { useEffect,useState } from 'react';
-import { useNavigate,useParams } from 'react-router-dom';
-import { internshipService,type Internship } from '../../services/internshipService';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { internshipService } from '../../services/internshipService';
+import type { Internship } from '../../services/internshipService';
 import { applicationService } from '../../services/applicationService';
 
-export default function InternshipDetailsPage(){
- const {id}=useParams();
- const navigate=useNavigate();
- const [internship,setInternship]=useState<Internship|null>(null);
- const [motivationMessage,setMotivationMessage]=useState('');
- const [loading,setLoading]=useState(true);
- const [sending,setSending]=useState(false);
- const [message,setMessage]=useState('');
+export default function InternshipDetailsPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [internship, setInternship] = useState<Internship | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
+  const [motivationMessage, setMotivationMessage] = useState('');
+  const [message, setMessage] = useState('');
 
- useEffect(()=>{
-  if(!id)return;
-  internshipService.getById(id).then(setInternship).catch(()=>setMessage('Impossible de charger cette offre')).finally(()=>setLoading(false));
- },[id]);
+  useEffect(() => {
+    if (!id) return;
 
- const handleApply=async()=>{
-  if(!id)return;
-  setSending(true);
-  setMessage('');
-  try{
-   await applicationService.create({internshipId:id,motivationMessage});
-   setMessage('Votre candidature a été envoyée avec succès.');
-   setTimeout(()=>navigate('/student/applications'),1000);
-  }catch(error:any){
-   setMessage(error?.response?.data?.message||'Impossible d’envoyer la candidature');
-  }finally{
-   setSending(false);
+    const load = async () => {
+      try {
+        const data = await internshipService.getById(id);
+        setInternship(data);
+      } catch (error) {
+        console.error('Erreur chargement offre:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [id]);
+
+  const handleApply = async () => {
+    if (!internship) return;
+
+    setApplying(true);
+    setMessage('');
+
+    try {
+      await applicationService.create({
+        internshipId: internship.id,
+        motivationMessage: motivationMessage || undefined,
+      });
+
+      setMessage('Votre candidature a été envoyée avec succès.');
+      setMotivationMessage('');
+    } catch (error: any) {
+      setMessage(
+        error?.response?.data?.message || 'Erreur lors de la candidature.'
+      );
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-6">Chargement...</div>;
   }
- };
 
- if(loading)return <div className="p-6">Chargement...</div>;
- if(!internship)return <div className="p-6">Offre introuvable.</div>;
+  if (!internship) {
+    return (
+      <div className="p-6">
+        <p>Offre introuvable.</p>
+      </div>
+    );
+  }
 
- return(
-  <div className="p-6 max-w-4xl mx-auto">
-   <button onClick={()=>navigate(-1)} className="mb-6">← Retour</button>
-   <div className="bg-white rounded-xl shadow p-6">
-    <h1 className="text-3xl font-bold mb-2">{internship.title}</h1>
-    <p className="text-gray-500 mb-6">{internship.domain}</p>
-    <div className="grid md:grid-cols-2 gap-4 mb-6">
-     <div><strong>Durée :</strong> {internship.duration||'Non précisée'}</div>
-     <div><strong>Lieu :</strong> {internship.location||'Non précisé'}</div>
-     <div><strong>Places :</strong> {internship.numberOfPlaces}</div>
-     <div><strong>Statut :</strong> {internship.status}</div>
+  return (
+    <div className="p-6">
+      <button
+        onClick={() => navigate('/student/internships')}
+        className="mb-6 text-blue-600"
+      >
+        ← Retour aux offres
+      </button>
+
+      <div className="mx-auto max-w-4xl rounded-xl border bg-white p-8 shadow-sm">
+        <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
+          {internship.domain}
+        </span>
+
+        <h1 className="mt-5 text-3xl font-bold">
+          {internship.title}
+        </h1>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="text-sm text-gray-500">Domaine</p>
+            <p className="font-medium">{internship.domain}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">Durée</p>
+            <p className="font-medium">
+              {internship.duration || 'Non précisée'}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">Places</p>
+            <p className="font-medium">{internship.numberOfPlaces}</p>
+          </div>
+        </div>
+
+        {internship.location && (
+          <div className="mt-6">
+            <p className="text-sm text-gray-500">Localisation</p>
+            <p className="font-medium">📍 {internship.location}</p>
+          </div>
+        )}
+
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold">Description</h2>
+          <p className="mt-3 whitespace-pre-line leading-7 text-gray-700">
+            {internship.description}
+          </p>
+        </div>
+
+        <div className="mt-8 border-t pt-6">
+          <h2 className="text-xl font-semibold">
+            Candidature
+          </h2>
+
+          <textarea
+            value={motivationMessage}
+            onChange={(e) => setMotivationMessage(e.target.value)}
+            placeholder="Écrivez votre message de motivation..."
+            className="mt-4 w-full rounded-lg border p-3"
+            rows={5}
+          />
+
+          {message && (
+            <p className="mt-3 text-sm text-blue-600">
+              {message}
+            </p>
+          )}
+
+          <button
+            onClick={handleApply}
+            disabled={applying}
+            className="mt-4 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {applying ? 'Envoi...' : 'Postuler à cette offre'}
+          </button>
+
+          <button
+            onClick={() => navigate('/student/applications')}
+            className="ml-3 rounded-lg border px-6 py-3 font-medium"
+          >
+            Mes candidatures
+          </button>
+        </div>
+      </div>
     </div>
-    <h2 className="text-xl font-semibold mb-2">Description</h2>
-    <p className="mb-6 whitespace-pre-line">{internship.description}</p>
-    <h2 className="text-xl font-semibold mb-2">Message de motivation</h2>
-    <textarea value={motivationMessage} onChange={e=>setMotivationMessage(e.target.value)} rows={6} className="w-full border rounded-lg p-3 mb-4" placeholder="Présentez brièvement votre motivation..." />
-    {message&&<div className="mb-4 p-3 rounded-lg bg-gray-100">{message}</div>}
-    <button onClick={handleApply} disabled={sending} className="px-6 py-3 rounded-lg bg-blue-600 text-white disabled:opacity-50">
-     {sending?'Envoi...':'Postuler à cette offre'}
-    </button>
-   </div>
-  </div>
- );
+  );
 }

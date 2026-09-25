@@ -10,6 +10,9 @@ import { ProfileModule } from './profile/profile.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { StagesModule } from './stages/stages.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { ReportsModule } from './reports/reports.module.js';
+import { EvaluationsModule } from './evaluations/evaluations.module.js';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -21,7 +24,10 @@ import { NotificationsModule } from './notifications/notifications.module.js';
     ProfileModule,
     ApplicationsModule,
     StagesModule,
+    ReportsModule,
     NotificationsModule,
+    EvaluationsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,60 +1,77 @@
 import api from './api';
 
-export type ApplicationStatus =
-    | 'PENDING'
-    | 'ACCEPTED'
-    | 'REJECTED';
+export type ApplicationStatus = 'EN_ATTENTE' | 'ACCEPTEE' | 'REFUSEE' | 'ANNULEE';
 
 export interface Application {
- id:string;
- studentId:string;
- internshipId:string;
- motivationMessage?:string;
- cvUrl?:string;
- status:ApplicationStatus;
- appliedAt:string;
- internship?:{
-  id:string;
-  title:string;
-  description:string;
-  domain:string;
-  location?:string;
-  company?:{companyName:string};
-  supervisor?:{firstName:string;lastName:string};
- };
- student?:{
-  firstName:string;
-  lastName:string;
-  phone?:string;
-  institution?:string;
-  specialty?:string;
-  cvUrl?:string;
- };
+  id: string;
+  studentId: string;
+  internshipId: string;
+  motivationMessage?: string;
+  cvUrl?: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  student?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    user?: { email: string };
+  };
+  internship?: {
+    id: string;
+    title: string;
+    description?: string;
+    domain?: string;
+    duration?: string;
+    location?: string;
+    status?: string;
+    company?: {
+      id: string;
+      companyName: string;
+    };
+    supervisor?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+  };
 }
 
-export const applicationService={
- create:async(data:{internshipId:string;motivationMessage?:string;cvUrl?:string})=>{
-  const {data:result}=await api.post<Application>('/applications',data);
-  return result;
- },
- getMine:async()=>{
-  const {data}=await api.get<Application[]>('/applications/mine');
-  return data;
- },
- getAll:async()=>{
-  const {data}=await api.get<Application[]>('/applications');
-  return data;
- },
- getById:async(id:string)=>{
-  const {data}=await api.get<Application>(`/applications/${id}`);
-  return data;
- },
- updateStatus:async(id:string,status:Application['status'])=>{
-  const {data}=await api.patch<Application>(`/applications/${id}/status`,{status});
-  return data;
- },
- cancel:async(id:string)=>{
-  const {data}=await api.delete<Application>(`/applications/${id}/cancel`);
-  return data;
- }
+export interface CreateApplicationData {
+  internshipId: string;
+  motivationMessage?: string;
+  cvUrl?: string;
+}
+
+export const applicationService = {
+  getAll: async (): Promise<Application[]> => {
+    const response = await api.get('/applications');
+    return response.data;
+  },
+
+  getMyApplications: async (): Promise<Application[]> => {
+  const response = await api.get('/applications');
+  return response.data;
+},
+
+  getById: async (id: string): Promise<Application> => {
+    const response = await api.get(`/applications/${id}`);
+    return response.data;
+  },
+
+  create: async (payload: CreateApplicationData): Promise<Application> => {
+    const response = await api.post('/applications', payload);
+    return response.data;
+  },
+
+  updateStatus: async (id: string, status: ApplicationStatus): Promise<Application> => {
+    const response = await api.patch(`/applications/${id}/status`, { status });
+    return response.data;
+  },
+
+  remove: async (id: string): Promise<Application> => {
+    const response = await api.delete(`/applications/${id}`);
+    return response.data;
+  }
 };

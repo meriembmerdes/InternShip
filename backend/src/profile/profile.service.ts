@@ -29,10 +29,52 @@ export class ProfileService {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+
+      firstName: user.firstName,
+      lastName: user.lastName,
+
       student: user.student,
       supervisor: user.supervisor,
       company: user.company,
     };
+  }
+
+  async updateAdminProfile(
+    userId: string,
+    data: {
+      firstName?: string;
+      lastName?: string;
+    },
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable.');
+    }
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException(
+        'Ce profil est réservé aux administrateurs.',
+      );
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isActive: true,
+        firstName: true,
+        lastName: true,
+      },
+    });
   }
 
   async updateStudentProfile(
