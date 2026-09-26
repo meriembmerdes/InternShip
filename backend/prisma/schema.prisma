@@ -17,7 +17,12 @@ enum UserStatus {
   ACTIVE
   INACTIVE
 }
-
+enum InternshipType {
+  OUVRIER
+  TECHNICIEN
+  FIN_ETUDE
+  ETE
+}
 enum InternshipStatus {
   BROUILLON
   PUBLIEE
@@ -154,27 +159,35 @@ model StudentSkill {
 }
 
 model Internship {
-  id             String           @id @default(uuid())
-  title          String
-  description    String
-  domain         String
-  duration       String?
-  location       String?
-  startDate      DateTime?
-  endDate        DateTime?
-  numberOfPlaces Int              @default(1)
-  publishedAt    DateTime?
-  status         InternshipStatus @default(BROUILLON)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id String @id @default(uuid())
 
-  companyId    String?
+  title String
+  description String
+  domain String
+  type InternshipType
+
+  duration String?
+  location String?
+  startDate DateTime?
+  endDate DateTime?
+
+  numberOfPlaces Int @default(1)
+
+  publishedAt DateTime?
+  status InternshipStatus @default(BROUILLON)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyId String?
   supervisorId String?
-  company      Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  supervisor   Supervisor? @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  supervisor Supervisor? @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+
   applications Application[]
-  stages       Stage[]
-  skillLinks   InternshipSkill[]
+  stages Stage[]
+  skillLinks InternshipSkill[]
 }
 
 model InternshipSkill {

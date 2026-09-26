@@ -22,6 +22,8 @@ import CompaniesPage from './pages/admin/CompaniesPage';
 import StagePage from './pages/admin/StagePage';
 import AdminApplicationsPage from './pages/admin/ApplicationsPage';
 import AppLayout from './components/AppLayout';
+import SupervisorInternshipsPage from './pages/supervisor/InternshipsPage';
+import CompanyInternshipsPage from './pages/company/InternshipsPage';
 
 import './App.css';
 import ProfilePage from './pages/ProfilePage';
@@ -106,6 +108,10 @@ export default function App() {
               path="/supervisor/stages"
               element={<ComingSoonPage />}
             />
+            <Route
+              path="/supervisor/internships"
+              element={<SupervisorInternshipsPage />}
+            />
 
             <Route
               path="/supervisor/evaluations"
@@ -136,7 +142,7 @@ export default function App() {
 
             <Route
               path="/company/internships"
-              element={<ComingSoonPage />}
+              element={<CompanyInternshipsPage />}
             />
 
             <Route path="/company/applications" 

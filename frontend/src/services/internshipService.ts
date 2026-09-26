@@ -6,11 +6,18 @@ export type InternshipStatus =
   | 'FERMEE'
   | 'TERMINEE';
 
+export type InternshipType =
+  | 'OUVRIER'
+  | 'TECHNICIEN'
+  | 'FIN_ETUDE'
+  | 'ETE';
+
 export interface Internship {
   id: string;
   title: string;
   description: string;
   domain: string;
+  type: InternshipType;
   duration?: string;
   location?: string;
   startDate?: string;
@@ -48,6 +55,7 @@ export interface InternshipFormData {
   title: string;
   description: string;
   domain: string;
+  type?: InternshipType;
   duration?: string;
   location?: string;
   startDate?: string;
@@ -61,10 +69,21 @@ export interface InternshipFormData {
 export interface InternshipQuery {
   search?: string;
   domain?: string;
+  type?: InternshipType;
   location?: string;
   status?: InternshipStatus;
   page?: number;
   limit?: number;
+}
+export interface Supervisor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  profession?: string;
+  user?: {
+    email: string;
+    status: string;
+  };
 }
 
 export const internshipService = {
@@ -122,5 +141,12 @@ export const internshipService = {
     id: string,
   ): Promise<void> => {
     await api.delete(`/internships/${id}`);
+  },
+  getAvailableSupervisors: async (): Promise<Supervisor[]> => {
+  const { data } = await api.get<Supervisor[]>(
+    '/internships/supervisors/available',
+  );
+
+  return data;
   },
 };

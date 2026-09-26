@@ -187,105 +187,229 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="page-shell">
-      <RoleNavigation />
+  <div className="profile-page">
+    <RoleNavigation />
 
-      <header className="topbar">
+    <main className="profile-content">
+      <div className="profile-header">
         <div>
-          <p className="eyebrow">Mon profil</p>
-          <h1>Gérer mon profil</h1>
-          <p>{profile.email}</p>
+          <p className="profile-eyebrow">MON PROFIL</p>
+          <h1>Mon profil</h1>
+          <p className="profile-subtitle">
+            Gérez vos informations personnelles et professionnelles.
+          </p>
         </div>
-      </header>
 
-      {message ? (
-        <div className="message success">
-          {message}
+        <div className="profile-role-badge">
+          {profile.role === 'STUDENT'
+            ? 'Étudiant'
+            : profile.role === 'SUPERVISOR'
+            ? 'Encadrant'
+            : profile.role === 'COMPANY'
+            ? 'Entreprise'
+            : 'Administrateur'}
         </div>
-      ) : null}
+      </div>
 
-      {error ? (
-        <div className="message error">
-          {error}
+      {message && (
+        <div className="profile-alert profile-alert-success">
+          ✓ {message}
         </div>
-      ) : null}
+      )}
 
-      <form
-        className="profile-form"
-        onSubmit={handleSubmit}
-      >
-        <div className="form-section">
-          <h2>Informations du compte</h2>
+      {error && (
+        <div className="profile-alert profile-alert-error">
+          ! {error}
+        </div>
+      )}
 
-          <div className="profile-readonly">
+      <div className="profile-layout">
+
+        <aside className="profile-card">
+          <div className="profile-avatar">
+            {(
+              profile.firstName ||
+              profile.student?.firstName ||
+              profile.supervisor?.firstName ||
+              profile.company?.companyName ||
+              'U'
+            )
+              .charAt(0)
+              .toUpperCase()}
+          </div>
+
+          <h2>
+            {profile.role === 'STUDENT'
+              ? `${profile.student?.firstName ?? ''} ${profile.student?.lastName ?? ''}`
+              : profile.role === 'SUPERVISOR'
+              ? `${profile.supervisor?.firstName ?? ''} ${profile.supervisor?.lastName ?? ''}`
+              : profile.role === 'COMPANY'
+              ? profile.company?.companyName
+              : `${profile.firstName ?? ''} ${profile.lastName ?? ''}`}
+          </h2>
+
+          <span className="profile-card-role">
+            {profile.role === 'STUDENT'
+              ? 'Étudiant'
+              : profile.role === 'SUPERVISOR'
+              ? 'Encadrant'
+              : profile.role === 'COMPANY'
+              ? 'Entreprise'
+              : 'Administrateur'}
+          </span>
+
+          <div className="profile-card-info">
             <div>
               <span>Email</span>
               <strong>{profile.email}</strong>
             </div>
 
             <div>
-              <span>Rôle</span>
-              <strong>{profile.role}</strong>
+              <span>Statut</span>
+              <strong
+                className={
+                  profile.isActive === 'ACTIVE'
+                    ? 'profile-status active'
+                    : 'profile-status inactive'
+                }
+              >
+                <i />
+                {profile.isActive === 'ACTIVE'
+                  ? 'Actif'
+                  : 'Inactif'}
+              </strong>
             </div>
           </div>
-        </div>
-        {profile.role === 'ADMIN' ? (
-          <div className="form-section">
-            <h2>Informations administrateur</h2>
+        </aside>
 
-            {renderField('Prénom', 'firstName')}  
-            {renderField('Nom', 'lastName')}
+        <form
+          className="profile-form-modern"
+          onSubmit={handleSubmit}
+        >
+          <div className="profile-section">
+            <div className="profile-section-header">
+              <div>
+                <h2>Informations du compte</h2>
+                <p>Informations générales de votre compte.</p>
+              </div>
+            </div>
+
+            <div className="profile-account-grid">
+              <div className="profile-info-box">
+                <span>Adresse email</span>
+                <strong>{profile.email}</strong>
+              </div>
+
+              <div className="profile-info-box">
+                <span>Rôle</span>
+                <strong>
+                  {profile.role === 'STUDENT'
+                    ? 'Étudiant'
+                    : profile.role === 'SUPERVISOR'
+                    ? 'Encadrant'
+                    : profile.role === 'COMPANY'
+                    ? 'Entreprise'
+                    : 'Administrateur'}
+                </strong>
+              </div>
+            </div>
           </div>
-        ) : null}
 
-        {profile.role === 'STUDENT' ? (
-          <div className="form-section">
-            <h2>Informations étudiant</h2>
+          {profile.role === 'ADMIN' && (
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <div>
+                  <h2>Informations personnelles</h2>
+                  <p>Modifiez vos informations administrateur.</p>
+                </div>
+              </div>
 
-            {renderField('Prénom', 'firstName')}
-            {renderField('Nom', 'lastName')}
-            {renderField('Téléphone', 'phone', 'tel')}
-            {renderField('Institution', 'institution')}
-            {renderField('Spécialité', 'specialty')}
-            {renderField('Niveau', 'level')}
-            {renderField('Biographie', 'bio')}
+              <div className="profile-fields-grid">
+                {renderField('Prénom', 'firstName')}
+                {renderField('Nom', 'lastName')}
+              </div>
+            </div>
+          )}
+
+          {profile.role === 'STUDENT' && (
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <div>
+                  <h2>Informations étudiant</h2>
+                  <p>Vos informations personnelles et académiques.</p>
+                </div>
+              </div>
+
+              <div className="profile-fields-grid">
+                {renderField('Prénom', 'firstName')}
+                {renderField('Nom', 'lastName')}
+                {renderField('Téléphone', 'phone', 'tel')}
+                {renderField('Institution', 'institution')}
+                {renderField('Spécialité', 'specialty')}
+                {renderField('Niveau', 'level')}
+              </div>
+
+              <div className="profile-full-field">
+                {renderField('Biographie', 'bio')}
+              </div>
+            </div>
+          )}
+
+          {profile.role === 'SUPERVISOR' && (
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <div>
+                  <h2>Informations encadrant</h2>
+                  <p>Vos informations professionnelles.</p>
+                </div>
+              </div>
+
+              <div className="profile-fields-grid">
+                {renderField('Prénom', 'firstName')}
+                {renderField('Nom', 'lastName')}
+                {renderField('Profession', 'profession')}
+                {renderField('Département', 'department')}
+              </div>
+            </div>
+          )}
+
+          {profile.role === 'COMPANY' && (
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <div>
+                  <h2>Informations entreprise</h2>
+                  <p>Les informations de votre entreprise.</p>
+                </div>
+              </div>
+
+              <div className="profile-fields-grid">
+                {renderField('Nom de l’entreprise', 'companyName')}
+                {renderField('Nom du responsable', 'managerName')}
+                {renderField('Fonction du responsable', 'managerTitle')}
+                {renderField('Secteur', 'sector')}
+                {renderField('Téléphone', 'phone', 'tel')}
+              </div>
+
+              <div className="profile-full-field">
+                {renderField('Adresse', 'address')}
+              </div>
+            </div>
+          )}
+
+          <div className="profile-actions">
+            <button
+              className="profile-save-button"
+              type="submit"
+              disabled={isSaving}
+            >
+              {isSaving
+                ? 'Enregistrement…'
+                : 'Enregistrer les modifications'}
+            </button>
           </div>
-        ) : null}
-
-        {profile.role === 'SUPERVISOR' ? (
-          <div className="form-section">
-            <h2>Informations encadrant</h2>
-
-            {renderField('Prénom', 'firstName')}
-            {renderField('Nom', 'lastName')}
-            {renderField('Profession', 'profession')}
-            {renderField('Département', 'department')}
-          </div>
-        ) : null}
-
-        {profile.role === 'COMPANY' ? (
-          <div className="form-section">
-            <h2>Informations entreprise</h2>
-
-            {renderField('Nom de l’entreprise', 'companyName')}
-            {renderField('Nom du responsable', 'managerName')}
-            {renderField('Fonction du responsable', 'managerTitle')}
-            {renderField('Secteur', 'sector')}
-            {renderField('Adresse', 'address')}
-            {renderField('Téléphone', 'phone', 'tel')}
-          </div>
-        ) : null}
-
-        <button
-  className="primary-button"
-  type="submit"
-  disabled={isSaving}
->
-  {isSaving
-    ? 'Enregistrement…'
-    : 'Enregistrer les modifications'}
-</button>
-      </form>
-    </div>
-  );
+        </form>
+      </div>
+    </main>
+  </div>
+);
 }

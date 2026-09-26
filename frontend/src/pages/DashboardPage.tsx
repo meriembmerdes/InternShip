@@ -311,6 +311,14 @@ const fullName = getUserName();
                     {stats.notificationsCount}
                   </strong>
                 </div>
+                <button
+                  onClick={() =>
+                  navigate('/supervisor/internships')
+                  }
+                  className="primary-button"
+                >
+                📋 Mes offres de stage
+                </button>
 
                 <button
                   onClick={() =>

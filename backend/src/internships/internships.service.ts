@@ -12,7 +12,7 @@ import {
   UpdateInternshipDto,
 } from './dto/internship.dto.js';
 
-import { Role, InternshipStatus } from '@prisma/client';
+import { Role, InternshipStatus} from '@prisma/client';
 
 @Injectable()
 export class InternshipsService {
@@ -41,7 +41,7 @@ export class InternshipsService {
       }
 
       companyId = company.id;
-      supervisorId = undefined;
+      supervisorId = supervisorId ;
     }
 
     // Un encadrant crée automatiquement une offre pour lui-même
@@ -67,29 +67,30 @@ export class InternshipsService {
 
     return this.prisma.internship.create({
       data: {
-        title: dto.title,
-        description: dto.description,
-        domain: dto.domain,
-        duration: dto.duration,
-        location: dto.location,
-        startDate: dto.startDate
-          ? new Date(dto.startDate)
-          : undefined,
-        endDate: dto.endDate
-          ? new Date(dto.endDate)
-          : undefined,
-        numberOfPlaces: dto.numberOfPlaces ?? 1,
+  title: dto.title,
+  description: dto.description,
+  domain: dto.domain,
+  type: dto.type as any,
+  duration: dto.duration,
+  location: dto.location,
+  startDate: dto.startDate
+    ? new Date(dto.startDate)
+    : undefined,
+  endDate: dto.endDate
+    ? new Date(dto.endDate)
+    : undefined,
+  numberOfPlaces: dto.numberOfPlaces ?? 1,
 
-        status,
+  status,
 
-        publishedAt:
-          status === InternshipStatus.PUBLIEE
-            ? new Date()
-            : undefined,
+  publishedAt:
+    status === InternshipStatus.PUBLIEE
+      ? new Date()
+      : undefined,
 
-        companyId,
-        supervisorId,
-      },
+  companyId,
+  supervisorId,
+},
 
       include: {
         company: true,
@@ -155,21 +156,20 @@ export class InternshipsService {
     // -------------------------------------------------------
 
     if (user.role === Role.SUPERVISOR) {
-      const supervisor =
-        await this.prisma.supervisor.findUnique({
-          where: {
-            userId: user.id,
-          },
-        });
+  const supervisor = await this.prisma.supervisor.findUnique({
+    where: {
+      userId: user.id,
+    },
+  });
 
-      if (!supervisor) {
-        throw new NotFoundException(
-          'Profil encadrant introuvable.',
-        );
-      }
+  if (!supervisor) {
+    throw new NotFoundException(
+      'Profil encadrant introuvable.',
+    );
+  }
 
-      where.supervisorId = supervisor.id;
-    }
+  where.supervisorId = supervisor.id;
+}
 
     // -------------------------------------------------------
     // ADMIN
@@ -228,6 +228,9 @@ export class InternshipsService {
         mode: 'insensitive',
       };
     }
+    if (query.type) {
+  where.type = query.type;
+}
 
     const [data, total] =
       await Promise.all([
@@ -395,36 +398,36 @@ export class InternshipsService {
       where: {
         id,
       },
-
+      
       data: {
-        title: dto.title,
-        description: dto.description,
-        domain: dto.domain,
-        duration: dto.duration,
-        location: dto.location,
+  title: dto.title,
+  description: dto.description,
+  domain: dto.domain,
+  type: dto.type? (dto.type as any): undefined,
+  duration: dto.duration,
+  location: dto.location,
 
-        startDate: dto.startDate
-          ? new Date(dto.startDate)
-          : undefined,
+  startDate: dto.startDate
+    ? new Date(dto.startDate)
+    : undefined,
 
-        endDate: dto.endDate
-          ? new Date(dto.endDate)
-          : undefined,
+  endDate: dto.endDate
+    ? new Date(dto.endDate)
+    : undefined,
 
-        numberOfPlaces:
-          dto.numberOfPlaces,
+  numberOfPlaces: dto.numberOfPlaces,
 
-        status: newStatus,
+  status: newStatus,
 
-        publishedAt,
+  publishedAt,
 
-        ...(user.role === Role.ADMIN
-          ? {
-              companyId: dto.companyId,
-              supervisorId: dto.supervisorId,
-            }
-          : {}),
-      },
+  ...(user.role === Role.ADMIN
+    ? {
+        companyId: dto.companyId,
+        supervisorId: dto.supervisorId,
+      }
+    : {}),
+},
 
       include: {
         company: true,
@@ -516,4 +519,23 @@ export class InternshipsService {
       }
     }
   }
+  async getAvailableSupervisors() {
+  return this.prisma.supervisor.findMany({
+    orderBy: {
+      lastName: 'asc',
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      profession: true,
+      user: {
+        select: {
+          email: true,
+          isActive: true,
+        },
+      },
+    },
+  });
+}
 }

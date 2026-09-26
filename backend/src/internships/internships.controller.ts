@@ -1,4 +1,15 @@
-import {Body,Controller,Delete,Get,Param,Patch,Post,Query,Req,UseGuards} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
@@ -10,7 +21,11 @@ import { Role } from '@prisma/client';
 
 import { InternshipsService } from './internships.service.js';
 
-import {CreateInternshipDto,UpdateInternshipDto,InternshipQueryDto} from './dto/internship.dto.js';
+import {
+  CreateInternshipDto,
+  UpdateInternshipDto,
+  InternshipQueryDto,
+} from './dto/internship.dto.js';
 
 @ApiTags('internships')
 @ApiBearerAuth()
@@ -21,23 +36,17 @@ export class InternshipsController {
     private readonly internshipsService: InternshipsService,
   ) {}
 
-  // ============================================
-  // CRÉER UNE OFFRE
-  // ADMIN / SUPERVISOR / COMPANY
-  // ============================================
-
   @Post()
   @Roles(Role.ADMIN, Role.SUPERVISOR, Role.COMPANY)
   create(
     @Body() dto: CreateInternshipDto,
     @Req() req: any,
   ) {
-    return this.internshipsService.create(dto, req.user);
+    return this.internshipsService.create(
+      dto,
+      req.user,
+    );
   }
-
-  // ============================================
-  // LISTE DES OFFRES
-  // ============================================
 
   @Get()
   @Roles(
@@ -50,12 +59,21 @@ export class InternshipsController {
     @Query() query: InternshipQueryDto,
     @Req() req: any,
   ) {
-    return this.internshipsService.findAll(query, req.user);
+    return this.internshipsService.findAll(
+      query,
+      req.user,
+    );
   }
 
-  // ============================================
-  // CONSULTER UNE OFFRE
-  // ============================================
+  // ==============================
+  // ENCADRANTS DISPONIBLES
+  // ==============================
+
+  @Get('supervisors/available')
+  @Roles(Role.ADMIN, Role.COMPANY)
+  getAvailableSupervisors() {
+    return this.internshipsService.getAvailableSupervisors();
+  }
 
   @Get(':id')
   @Roles(
@@ -68,12 +86,11 @@ export class InternshipsController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    return this.internshipsService.findOne(id, req.user);
+    return this.internshipsService.findOne(
+      id,
+      req.user,
+    );
   }
-
-  // ============================================
-  // MODIFIER UNE OFFRE
-  // ============================================
 
   @Patch(':id')
   @Roles(Role.ADMIN, Role.SUPERVISOR, Role.COMPANY)
@@ -82,12 +99,12 @@ export class InternshipsController {
     @Body() dto: UpdateInternshipDto,
     @Req() req: any,
   ) {
-    return this.internshipsService.update(id, dto, req.user);
+    return this.internshipsService.update(
+      id,
+      dto,
+      req.user,
+    );
   }
-
-  // ============================================
-  // SUPPRIMER UNE OFFRE
-  // ============================================
 
   @Delete(':id')
   @Roles(Role.ADMIN, Role.SUPERVISOR, Role.COMPANY)
@@ -95,6 +112,9 @@ export class InternshipsController {
     @Param('id') id: string,
     @Req() req: any,
   ) {
-    return this.internshipsService.remove(id, req.user);
+    return this.internshipsService.remove(
+      id,
+      req.user,
+    );
   }
 }

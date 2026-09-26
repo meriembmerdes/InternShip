@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {internshipService,type Internship} from '../../services/internshipService';
+import {
+  internshipService,
+  type Internship,
+  type InternshipType,
+} from '../../services/internshipService';
 
 export default function InternshipsPage() {
   const navigate = useNavigate();
@@ -11,6 +15,8 @@ export default function InternshipsPage() {
 
   const [search, setSearch] = useState('');
   const [domain, setDomain] = useState('');
+  const [type, setType] =
+    useState<InternshipType | ''>('');
 
   const [loading, setLoading] =
     useState(true);
@@ -23,6 +29,7 @@ export default function InternshipsPage() {
         await internshipService.getAll({
           search: search || undefined,
           domain: domain || undefined,
+          type: type || undefined,
           page: 1,
           limit: 20,
         });
@@ -59,29 +66,70 @@ export default function InternshipsPage() {
         </p>
       </div>
 
-      {/* SEARCH */}
+      {/* FILTRES */}
 
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
+      <div className="mb-8 grid gap-4 md:grid-cols-4">
 
-        <input
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          placeholder="Rechercher une offre..."
-          className="rounded-lg border px-4 py-3"
-        />
 
-        <input
+        <select
           value={domain}
           onChange={(e) =>
             setDomain(e.target.value)
           }
-          placeholder="Domaine..."
           className="rounded-lg border px-4 py-3"
-        />
+        >
+          <option value="">
+            Tous les domaines
+          </option>
 
-        <button
+          <option value="CF">
+            CF — Comptabilité et Finance
+          </option>
+
+          <option value="GTER">
+            GTER — Génie thermique et énergie renouvelable
+          </option>
+
+          <option value="IT">
+            IT — Technologie de l'informatique
+          </option>
+
+          <option value="M">
+            M — Mécanique
+          </option>
+        </select>
+
+        <select
+          value={type}
+          onChange={(e) =>
+            setType(
+              e.target.value as InternshipType | '',
+            )
+          }
+          className="rounded-lg border px-4 py-3"
+        >
+          <option value="">
+            Tous les types
+          </option>
+
+          <option value="OUVRIER">
+            Stage ouvrier
+          </option>
+
+          <option value="TECHNICIEN">
+            Stage technicien
+          </option>
+
+          <option value="FIN_ETUDE">
+            Stage de fin d'étude
+          </option>
+
+          <option value="ETE">
+            Stage d'été
+          </option>
+        </select>
+
+        <button style={{ marginLeft: '10px', backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', cursor: 'pointer', borderRadius: '10px' }}
           onClick={handleSearch}
           className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700"
         >
@@ -113,7 +161,7 @@ export default function InternshipsPage() {
           </div>
         )}
 
-      {/* OFFERS */}
+      {/* OFFRES */}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
@@ -123,10 +171,22 @@ export default function InternshipsPage() {
             className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md"
           >
 
-            <div className="mb-4">
+            <div className="mb-4 flex gap-2 flex-wrap">
+
               <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
                 {internship.domain}
               </span>
+
+              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                {internship.type === 'OUVRIER'
+                  ? 'Stage ouvrier'
+                  : internship.type === 'TECHNICIEN'
+                    ? 'Stage technicien'
+                    : internship.type === 'FIN_ETUDE'
+                      ? "Stage de fin d'étude"
+                      : "Stage d'été"}
+              </span>
+
             </div>
 
             <h2 className="text-xl font-bold">

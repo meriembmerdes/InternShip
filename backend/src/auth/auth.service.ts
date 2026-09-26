@@ -197,7 +197,7 @@ export class AuthService {
         student: true,
         supervisor: true,
         company: true,
-        admin: true,
+        
 },
     });
 
