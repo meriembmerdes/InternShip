@@ -24,6 +24,7 @@ import AdminApplicationsPage from './pages/admin/ApplicationsPage';
 import AppLayout from './components/AppLayout';
 import SupervisorInternshipsPage from './pages/supervisor/InternshipsPage';
 import CompanyInternshipsPage from './pages/company/InternshipsPage';
+import SupervisorReportsPage from './pages/supervisor/ReportsPage';
 
 import './App.css';
 import ProfilePage from './pages/ProfilePage';
@@ -111,6 +112,10 @@ export default function App() {
             <Route
               path="/supervisor/internships"
               element={<SupervisorInternshipsPage />}
+            />
+            <Route
+              path="/supervisor/reports"
+              element={<SupervisorReportsPage />}
             />
 
             <Route

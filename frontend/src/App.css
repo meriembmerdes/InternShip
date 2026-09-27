@@ -1767,3 +1767,331 @@ button:disabled {
     padding: 12px;
   }
 }
+/* =========================================
+   ÉTUDIANT - OFFRES DE STAGE
+   ========================================= */
+
+.p-6 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px !important;
+}
+
+/* ---------- En-tête ---------- */
+
+.mb-8:first-child {
+  margin-bottom: 32px;
+}
+
+.mb-8:first-child h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mb-8:first-child p {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 15px;
+}
+
+
+/* =========================================
+   FILTRES
+   ========================================= */
+
+.md\:grid-cols-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 14px;
+  align-items: center;
+}
+
+.md\:grid-cols-4 select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d5dbe3;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.md\:grid-cols-4 select:hover {
+  border-color: #94a3b8;
+}
+
+.md\:grid-cols-4 select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* ---------- Bouton recherche ---------- */
+
+.md\:grid-cols-4 button {
+  min-height: 46px;
+  padding: 0 24px !important;
+  margin-left: 0 !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer !important;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.md\:grid-cols-4 button:hover {
+  background: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.md\:grid-cols-4 button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================
+   MESSAGE CHARGEMENT
+   ========================================= */
+
+.text-gray-500 {
+  color: #64748b;
+}
+
+p.text-gray-500 {
+  font-size: 14px;
+}
+
+
+/* =========================================
+   AUCUNE OFFRE
+   ========================================= */
+
+.rounded-xl.border.bg-white.p-10 {
+  padding: 50px 25px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.rounded-xl.border.bg-white.p-10 h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.rounded-xl.border.bg-white.p-10 p {
+  margin-top: 8px;
+  color: #64748b;
+}
+
+
+/* =========================================
+   GRILLE DES OFFRES
+   ========================================= */
+
+.lg\:grid-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+
+/* =========================================
+   CARTE OFFRE
+   ========================================= */
+
+.lg\:grid-cols-3 > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05) !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.lg\:grid-cols-3 > div:hover {
+  transform: translateY(-3px);
+  border-color: #bfdbfe !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.09) !important;
+}
+
+
+/* ---------- Badges ---------- */
+
+.lg\:grid-cols-3 > div .flex.gap-2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.lg\:grid-cols-3 > div .rounded-full {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lg\:grid-cols-3 > div .bg-blue-100 {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.lg\:grid-cols-3 > div .bg-green-100 {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+}
+
+
+/* ---------- Titre ---------- */
+
+.lg\:grid-cols-3 > div h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+
+/* ---------- Description ---------- */
+
+.lg\:grid-cols-3 > div .text-gray-600 {
+  color: #64748b;
+}
+
+.lg\:grid-cols-3 > div > p {
+  margin-top: 12px;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+
+/* ---------- Informations ---------- */
+
+.lg\:grid-cols-3 > div .space-y-2 {
+  margin-top: 20px;
+}
+
+.lg\:grid-cols-3 > div .space-y-2 p {
+  margin: 0;
+  padding: 5px 0;
+  color: #475569;
+  font-size: 13px;
+}
+
+
+/* ---------- Bouton Voir l'offre ---------- */
+
+.lg\:grid-cols-3 > div button {
+  width: 100%;
+  margin-top: auto;
+  padding: 12px 16px !important;
+  margin-top: 20px;
+  border: none !important;
+  border-radius: 9px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.lg\:grid-cols-3 > div button:hover {
+  background: #1d4ed8 !important;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+}
+
+.lg\:grid-cols-3 > div button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================
+   RESPONSIVE - TABLETTE
+   ========================================= */
+
+@media (max-width: 950px) {
+  .p-6 {
+    padding: 24px !important;
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:grid-cols-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .md\:grid-cols-4 button {
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* =========================================
+   RESPONSIVE - MOBILE
+   ========================================= */
+
+@media (max-width: 650px) {
+  .p-6 {
+    padding: 18px !important;
+  }
+
+  .mb-8:first-child h1 {
+    font-size: 26px;
+  }
+
+  .md\:grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .md\:grid-cols-4 button {
+    grid-column: auto;
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .lg\:grid-cols-3 > div {
+    padding: 20px !important;
+  }
+}

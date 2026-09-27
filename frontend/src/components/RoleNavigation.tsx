@@ -78,6 +78,11 @@ const navigationByRole: Record<string, NavigationItem[]> = {
       icon: '◆',
     },
     {
+      label: 'Rapports',
+      path: '/supervisor/reports',
+      icon: '📄',
+    },
+    {
       label: 'Évaluations',
       path: '/supervisor/evaluations',
       icon: '★',

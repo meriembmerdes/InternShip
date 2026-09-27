@@ -15,35 +15,23 @@ export interface Report {
   submittedAt?: string;
   status: ReportStatus;
   comment?: string;
-  stage?: {
+  createdAt: string;
+  updatedAt: string;
+  student?: {
     id: string;
+    firstName: string;
+    lastName: string;
+  };
+
+  stage?: {
     internship?: {
-      id: string;
       title: string;
-      domain: string;
+      domain?: string;
     };
     company?: {
-      id: string;
       companyName: string;
     };
-    supervisor?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-    };
   };
-}
-
-export interface CreateReportData {
-  stageId: string;
-  studentId: string;
-  fileUrl: string;
-  comment?: string;
-}
-
-export interface UpdateReportData {
-  status?: ReportStatus;
-  comment?: string;
 }
 
 export const reportService = {
@@ -57,17 +45,59 @@ export const reportService = {
     return data;
   },
 
-  create: async (payload: CreateReportData): Promise<Report> => {
-    const { data } = await api.post<Report>('/reports', payload);
+  create: async (
+    stageId: string,
+    file: File,
+  ): Promise<Report> => {
+    const formData = new FormData();
+
+    formData.append('stageId', stageId);
+    formData.append('file', file);
+
+    const { data } = await api.post<Report>(
+      '/reports',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+
     return data;
   },
 
-  update: async (id: string, payload: UpdateReportData): Promise<Report> => {
-    const { data } = await api.patch<Report>(`/reports/${id}`, payload);
-    return data;
+  update: async (
+    id: string,
+    data: {
+      status?: ReportStatus;
+      comment?: string;
+    },
+  ): Promise<Report> => {
+    const response = await api.patch<Report>(
+      `/reports/${id}`,
+      data,
+    );
+
+    return response.data;
   },
 
   remove: async (id: string): Promise<void> => {
     await api.delete(`/reports/${id}`);
   },
+  updateStatus: async (
+  id: string,
+  status: ReportStatus,
+  comment?: string,
+): Promise<Report> => {
+  const { data } = await api.patch<Report>(
+    `/reports/${id}/status`,
+    {
+      status,
+      comment,
+    },
+  );
+
+  return data;
+},
 };
