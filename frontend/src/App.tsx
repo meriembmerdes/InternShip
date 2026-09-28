@@ -25,6 +25,10 @@ import AppLayout from './components/AppLayout';
 import SupervisorInternshipsPage from './pages/supervisor/InternshipsPage';
 import CompanyInternshipsPage from './pages/company/InternshipsPage';
 import SupervisorReportsPage from './pages/supervisor/ReportsPage';
+import SupervisorEvaluationsPage from './pages/supervisor/EvaluationsPage';
+import SupervisorStudentsPage from './pages/supervisor/StudentsPage';
+import SupervisorStagesPage from './pages/supervisor/StagesPage';
+import CompanyStagesPage from './pages/company/StagesPage';
 
 import './App.css';
 import ProfilePage from './pages/ProfilePage';
@@ -100,14 +104,14 @@ export default function App() {
 
             <Route
               path="/supervisor/students"
-              element={<ComingSoonPage />}
+              element={<SupervisorStudentsPage />}
             />
             <Route path="/supervisor/applications" 
             element={<SupervisorApplicationsPage/>}/>
 
             <Route
               path="/supervisor/stages"
-              element={<ComingSoonPage />}
+              element={<SupervisorStagesPage />}
             />
             <Route
               path="/supervisor/internships"
@@ -120,9 +124,10 @@ export default function App() {
 
             <Route
               path="/supervisor/evaluations"
-              element={<ComingSoonPage />}
+              element={<SupervisorEvaluationsPage />}
             />
-            <Route path="/supervisor/notifications" element={<NotificationsPage />} />
+            <Route path="/supervisor/notifications" 
+            element={<NotificationsPage />} />
           </Route>
           </Route>
 
@@ -155,7 +160,7 @@ export default function App() {
 
             <Route
               path="/company/stages"
-              element={<ComingSoonPage />}
+              element={<CompanyStagesPage />}
             />
             <Route path="/company/notifications" element={<NotificationsPage />} />
           </Route>
@@ -203,9 +208,9 @@ export default function App() {
               element={<NotificationsPage />} />
 
             <Route
-              path="/admin/settings"
-              element={<ComingSoonPage />}
-            />
+              path="/admin/profile"
+              element={<ProfilePage />}
+              />
             <Route
               path="/admin/stages"
               element={<StagePage />}

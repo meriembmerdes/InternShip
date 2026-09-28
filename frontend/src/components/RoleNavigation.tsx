@@ -169,8 +169,8 @@ const navigationByRole: Record<string, NavigationItem[]> = {
       icon: '●',
     },
     {
-      label: 'Administration',
-      path: '/admin/settings',
+      label: 'Profil administrateur',
+      path: '/admin/profile',
       icon: '⚙',
     },
   ],

@@ -3,151 +3,114 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Role, ReportStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service.js';
+import { UpdateReportStatusDto } from './dto/report.dto.js';
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
 
-  async create(
-    stageId: string,
-    file: Express.Multer.File,
-    user: any,
-  ) {
-    const student = await this.prisma.student.findUnique({
-      where: {
-        userId: user.userId,
-      },
-    });
+  async findAll(user: any) {
+    const where: any = {};
 
-    if (!student) {
-      throw new ForbiddenException(
-        'Profil étudiant introuvable.',
-      );
-    }
-
-    const stage = await this.prisma.stage.findUnique({
-      where: {
-        id: stageId,
-      },
-    });
-
-    if (!stage) {
-      throw new NotFoundException('Stage introuvable.');
-    }
-
-    if (stage.studentId !== student.id) {
-      throw new ForbiddenException(
-        'Vous ne pouvez déposer un rapport que pour votre propre stage.',
-      );
-    }
-
-    const fileUrl = `/uploads/reports/${file.filename}`;
-
-    return this.prisma.report.create({
-      data: {
-        stageId,
-        studentId: student.id,
-        fileUrl,
-        submittedAt: new Date(),
-        status: ReportStatus.DEPOSE,
-      },
-      include: {
-        stage: {
-          include: {
-            internship: true,
-            company: true,
+    if (user.role === 'STUDENT') {
+      const student =
+        await this.prisma.student.findUnique({
+          where: {
+            userId: user.userId,
           },
-        },
-      },
-    });
-  }
-
-  async getAll(user: any) {
-    if (user.role === Role.ADMIN) {
-      return this.prisma.report.findMany({
-        include: {
-          stage: {
-            include: {
-              internship: true,
-              company: true,
-              student: true,
-            },
-          },
-          student: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
-    }
-
-    if (user.role === Role.STUDENT) {
-      const student = await this.prisma.student.findUnique({
-        where: {
-          userId: user.userId,
-        },
-      });
+        });
 
       if (!student) {
-        throw new ForbiddenException(
-          'Profil étudiant introuvable.',
-        );
+        return [];
       }
 
-      return this.prisma.report.findMany({
-        where: {
-          studentId: student.id,
-        },
-        include: {
-          stage: {
-            include: {
-              internship: true,
-              company: true,
-            },
+      where.studentId = student.id;
+    }
+
+    if (user.role === 'SUPERVISOR') {
+      const supervisor =
+        await this.prisma.supervisor.findUnique({
+          where: {
+            userId: user.userId,
           },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
+        });
+
+      if (!supervisor) {
+        return [];
+      }
+
+      where.stage = {
+        supervisorId: supervisor.id,
+      };
     }
 
     return this.prisma.report.findMany({
+      where,
+
       include: {
-        stage: {
-          include: {
-            internship: true,
-            company: true,
-            student: true,
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
           },
         },
-        student: true,
+
+        stage: {
+          include: {
+            internship: {
+              select: {
+                id: true,
+                title: true,
+                domain: true,
+              },
+            },
+
+            company: {
+              select: {
+                id: true,
+                companyName: true,
+              },
+            },
+
+            supervisor: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
       },
+
       orderBy: {
         createdAt: 'desc',
       },
     });
   }
 
-  async getById(id: string, user: any) {
-    const report = await this.prisma.report.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        stage: {
-          include: {
-            internship: true,
-            company: true,
-            student: true,
+  async findOne(id: string, user: any) {
+    const report =
+      await this.prisma.report.findUnique({
+        where: { id },
+
+        include: {
+          student: true,
+
+          stage: {
+            include: {
+              internship: true,
+              company: true,
+              supervisor: true,
+            },
           },
         },
-        student: true,
-      },
-    });
+      });
 
     if (!report) {
       throw new NotFoundException(
@@ -155,16 +118,20 @@ export class ReportsService {
       );
     }
 
-    if (user.role === Role.STUDENT) {
-      const student = await this.prisma.student.findUnique({
-        where: {
-          userId: user.userId,
-        },
-      });
+    if (user.role === 'SUPERVISOR') {
+      const supervisor =
+        await this.prisma.supervisor.findUnique({
+          where: {
+            userId: user.userId,
+          },
+        });
 
-      if (!student || report.studentId !== student.id) {
+      if (
+        !supervisor ||
+        report.stage.supervisorId !== supervisor.id
+      ) {
         throw new ForbiddenException(
-          'Accès interdit à ce rapport.',
+          'Vous n’êtes pas autorisé à consulter ce rapport.',
         );
       }
     }
@@ -172,19 +139,32 @@ export class ReportsService {
     return report;
   }
 
-  async update(
+  async updateStatus(
     id: string,
-    data: {
-      status?: ReportStatus;
-      comment?: string;
-    },
+    dto: UpdateReportStatusDto,
     user: any,
   ) {
-    const report = await this.prisma.report.findUnique({
-      where: {
-        id,
-      },
-    });
+    const supervisor =
+      await this.prisma.supervisor.findUnique({
+        where: {
+          userId: user.userId,
+        },
+      });
+
+    if (!supervisor) {
+      throw new ForbiddenException(
+        'Profil encadrant introuvable.',
+      );
+    }
+
+    const report =
+      await this.prisma.report.findUnique({
+        where: { id },
+
+        include: {
+          stage: true,
+        },
+      });
 
     if (!report) {
       throw new NotFoundException(
@@ -192,120 +172,32 @@ export class ReportsService {
       );
     }
 
-    if (user.role === Role.STUDENT) {
-      const student = await this.prisma.student.findUnique({
-        where: {
-          userId: user.userId,
-        },
-      });
-
-      if (!student || report.studentId !== student.id) {
-        throw new ForbiddenException(
-          'Vous ne pouvez pas modifier ce rapport.',
-        );
-      }
+    if (
+      report.stage.supervisorId !== supervisor.id
+    ) {
+      throw new ForbiddenException(
+        'Vous ne pouvez pas modifier ce rapport.',
+      );
     }
 
     return this.prisma.report.update({
-      where: {
-        id,
+      where: { id },
+
+      data: {
+        status: dto.status,
+        comment: dto.comment,
       },
-      data,
-    });
-  }
 
-  async remove(id: string, user: any) {
-    const report = await this.prisma.report.findUnique({
-      where: {
-        id,
-      },
-    });
+      include: {
+        student: true,
 
-    if (!report) {
-      throw new NotFoundException(
-        'Rapport introuvable.',
-      );
-    }
-
-    if (user.role === Role.STUDENT) {
-      const student = await this.prisma.student.findUnique({
-        where: {
-          userId: user.userId,
-        },
-      });
-
-      if (!student || report.studentId !== student.id) {
-        throw new ForbiddenException(
-          'Vous ne pouvez pas supprimer ce rapport.',
-        );
-      }
-    }
-
-    await this.prisma.report.delete({
-      where: {
-        id,
-      },
-    });
-
-    return {
-      message: 'Rapport supprimé avec succès.',
-    };
-  }
-  async updateStatus(
-  id: string,
-  status: ReportStatus,
-  comment: string | undefined,
-  user: any,
-) {
-  const supervisor = await this.prisma.supervisor.findUnique({
-    where: {
-      userId: user.userId,
-    },
-  });
-
-  if (!supervisor) {
-    throw new ForbiddenException(
-      'Profil encadrant introuvable.',
-    );
-  }
-
-  const report = await this.prisma.report.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      stage: true,
-    },
-  });
-
-  if (!report) {
-    throw new NotFoundException(
-      'Rapport introuvable.',
-    );
-  }
-
-  if (report.stage.supervisorId !== supervisor.id) {
-    throw new ForbiddenException(
-      'Vous ne pouvez modifier que les rapports des étudiants que vous encadrez.',
-    );
-  }
-
-  return this.prisma.report.update({
-    where: {
-      id,
-    },
-    data: {
-      status,
-      comment,
-    },
-    include: {
-      student: true,
-      stage: {
-        include: {
-          internship: true,
+        stage: {
+          include: {
+            internship: true,
+            company: true,
+          },
         },
       },
-    },
-  });
-}
+    });
+  }
 }

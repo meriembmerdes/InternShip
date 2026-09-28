@@ -113,7 +113,7 @@ export default function CompaniesPage() {
                   </div>
                 </td>
 
-                <td>{company.user?.email}</td>
+                <td>{company.email}</td>
 
                 <td>
                   {company.sector || '—'}
@@ -128,8 +128,7 @@ export default function CompaniesPage() {
 
                 <td>
                   {new Date(
-                    company.user?.createdAt
-                  ).toLocaleDateString('fr-FR')}
+                    company.createdAt).toLocaleDateString('fr-FR')}
                 </td>
 
                 <td>

@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { EvaluationStatus } from '@prisma/client';
-import { IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+
+import {
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateEvaluationDto {
   @ApiProperty()

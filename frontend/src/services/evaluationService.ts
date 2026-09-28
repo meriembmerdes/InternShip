@@ -1,89 +1,109 @@
 import api from './api';
 
-export type EvaluationStatus = 'EN_ATTENTE' | 'ACCEPTEE' | 'REFUSEE';
+export type EvaluationStatus =
+  | 'EN_ATTENTE'
+  | 'ACCEPTEE'
+  | 'REFUSEE';
 
 export interface Evaluation {
   id: string;
   stageId: string;
   authorId: string;
   type: string;
-  criteria: Record<string, unknown>;
+  criteria: Record<string, any>;
   comment?: string;
   status: EvaluationStatus;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
 
   stage?: {
+    id: string;
     student?: {
-      id?: string;
+      id: string;
       firstName: string;
       lastName: string;
     };
     internship?: {
-      id?: string;
+      id: string;
       title: string;
-      domain?: string;
+      domain: string;
     };
     company?: {
-      id?: string;
+      id: string;
       companyName: string;
     };
+  };
+
+  author?: {
+    id: string;
+    firstName?: string;
+    lastName?: string;
   };
 }
 
 export interface CreateEvaluationData {
   stageId: string;
-  authorId: string;
-  criteria: Record<string, unknown>;
-  comment?: string;
-}
-
-export interface UpdateEvaluationData {
-  criteria?: Record<string, unknown>;
+  authorId?: string;
+  criteria: Record<string, any>;
   comment?: string;
   status?: EvaluationStatus;
 }
 
+export interface UpdateEvaluationData {
+  criteria?: Record<string, any>;
+  comment?: string;
+  status?: EvaluationStatus;
+}
+
+export interface EvaluationsResponse {
+  company: Evaluation[];
+  student: Evaluation[];
+  supervisor: Evaluation[];
+}
+
 export const evaluationService = {
-  getAll: async () => {
-    const { data } = await api.get<{
-      company: Evaluation[];
-      student: Evaluation[];
-      supervisor: Evaluation[];
-    }>('/evaluations');
+  getAll: async (): Promise<EvaluationsResponse> => {
+    const { data } =
+      await api.get<EvaluationsResponse>(
+        '/evaluations',
+      );
 
     return data;
   },
 
-  createForCompany: async (
+  createSupervisor: async (
     payload: CreateEvaluationData,
   ): Promise<Evaluation> => {
-    const { data } = await api.post<Evaluation>(
-      '/evaluations/company',
-      payload,
-    );
+    const { data } =
+      await api.post<Evaluation>(
+        '/evaluations/supervisor',
+        payload,
+      );
 
     return data;
   },
 
-  createForStudent: async (
-    payload: CreateEvaluationData,
+  updateSupervisor: async (
+    id: string,
+    payload: UpdateEvaluationData,
   ): Promise<Evaluation> => {
-    const { data } = await api.post<Evaluation>(
-      '/evaluations/student',
-      payload,
-    );
+    const { data } =
+      await api.patch<Evaluation>(
+        `/evaluations/supervisor/${id}`,
+        payload,
+      );
 
     return data;
   },
 
-  createForSupervisor: async (
+  createStudent: async (
     payload: CreateEvaluationData,
   ): Promise<Evaluation> => {
-    const { data } = await api.post<Evaluation>(
-      '/evaluations/supervisor',
-      payload,
-    );
+    const { data } =
+      await api.post<Evaluation>(
+        '/evaluations/student',
+        payload,
+      );
 
     return data;
   },
@@ -92,10 +112,36 @@ export const evaluationService = {
     id: string,
     payload: UpdateEvaluationData,
   ): Promise<Evaluation> => {
-    const { data } = await api.patch<Evaluation>(
-      `/evaluations/student/${id}`,
-      payload,
-    );
+    const { data } =
+      await api.patch<Evaluation>(
+        `/evaluations/student/${id}`,
+        payload,
+      );
+
+    return data;
+  },
+
+  createCompany: async (
+    payload: CreateEvaluationData,
+  ): Promise<Evaluation> => {
+    const { data } =
+      await api.post<Evaluation>(
+        '/evaluations/company',
+        payload,
+      );
+
+    return data;
+  },
+
+  updateCompany: async (
+    id: string,
+    payload: UpdateEvaluationData,
+  ): Promise<Evaluation> => {
+    const { data } =
+      await api.patch<Evaluation>(
+        `/evaluations/company/${id}`,
+        payload,
+      );
 
     return data;
   },

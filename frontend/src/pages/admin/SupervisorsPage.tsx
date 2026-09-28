@@ -128,7 +128,7 @@ export default function SupervisorsPage() {
                   </div>
                 </td>
 
-                <td>{supervisor.user?.email}</td>
+                <td>{supervisor.email}</td>
 
                 <td>
                   {supervisor.department || '—'}
@@ -143,8 +143,7 @@ export default function SupervisorsPage() {
 
                 <td>
                   {new Date(
-                    supervisor.user?.createdAt
-                  ).toLocaleDateString('fr-FR')}
+                    supervisor.createdAt).toLocaleDateString('fr-FR')}
                 </td>
 
                 <td>
