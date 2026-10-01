@@ -15,7 +15,6 @@ const getStatusLabel = (status: Stage['status']) => {
       return status;
   }
 };
-
 const getStatusClass = (status: Stage['status']) => {
   switch (status) {
     case 'EN_ATTENTE':
@@ -41,18 +40,37 @@ export default function StagesPage() {
   const [stages, setStages] = useState<Stage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadStages = async () => {
-      try {
-        const data = await stageService.getAll();
-        setStages(data);
-      } catch (error) {
-        console.error('Erreur chargement stages:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadStages = async () => {
+    try {
+      const data = await stageService.getAll();
+      setStages(data);
+    } catch (error) {
+      console.error('Erreur chargement stages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleFinishStage = async (stageId: string) => {
+    const confirmed = window.confirm(
+      'Voulez-vous vraiment terminer ce stage ? Cette action permettra ensuite de sélectionner un autre stage.'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await stageService.finish(stageId);
+      await loadStages();
+      alert(
+        'Votre stage est maintenant terminé. Vous pouvez sélectionner une autre candidature acceptée.'
+      );
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.response?.data?.message || 'Impossible de terminer le stage.');
+    }
+  };
+
+  useEffect(() => {
     loadStages();
   }, []);
 
@@ -193,6 +211,13 @@ export default function StagesPage() {
                   </p>
                 </div>
               </div>
+              {stage.status === 'EN_COURS' && (
+            <button
+              onClick={() => handleFinishStage(stage.id)}
+              className="rounded-lg bg-green-600 px-5 py-2 text-white hover:bg-green-700"
+              >✓ Terminer mon stage
+            </button>
+              )}
             </div>
           ))}
         </div>

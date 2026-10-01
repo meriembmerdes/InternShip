@@ -85,7 +85,7 @@ export default function CompanyApplicationsPage() {
                 </p>
 
                 <p>
-                  Étudiant : {application.studentId}
+                  Étudiant : {application.student?.firstName} {application.student?.lastName}
                 </p>
 
                 <p>

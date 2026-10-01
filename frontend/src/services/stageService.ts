@@ -1,6 +1,10 @@
 import api from './api';
 
-export type StageStatus = 'EN_ATTENTE' | 'EN_COURS' | 'TERMINE' | 'SUSPENDU';
+export type StageStatus =
+  | 'EN_ATTENTE'
+  | 'EN_COURS'
+  | 'TERMINE'
+  | 'SUSPENDU';
 
 export interface Stage {
   id: string;
@@ -8,28 +12,37 @@ export interface Stage {
   internshipId: string;
   companyId?: string;
   supervisorId?: string;
+
   startDate?: string;
   endDate?: string;
+
   status: StageStatus;
   progression: number;
+
   student?: {
     id: string;
     firstName: string;
     lastName: string;
   };
+
   company?: {
     id: string;
     companyName: string;
   };
+
   supervisor?: {
     id: string;
     firstName: string;
     lastName: string;
   };
+
   internship?: {
     id: string;
     title: string;
     domain: string;
+    location?: string;
+    startDate?: string;
+    endDate?: string;
   };
 }
 
@@ -63,13 +76,37 @@ export const stageService = {
     return data;
   },
 
-  create: async (payload: CreateStageData): Promise<Stage> => {
-    const { data } = await api.post<Stage>('/stages', payload);
+  create: async (
+    payload: CreateStageData,
+  ): Promise<Stage> => {
+    const { data } = await api.post<Stage>(
+      '/stages',
+      payload,
+    );
+
     return data;
   },
 
-  update: async (id: string, payload: UpdateStageData): Promise<Stage> => {
-    const { data } = await api.patch<Stage>(`/stages/${id}`, payload);
+  update: async (
+    id: string,
+    payload: UpdateStageData,
+  ): Promise<Stage> => {
+    const { data } = await api.patch<Stage>(
+      `/stages/${id}`,
+      payload,
+    );
+
+    return data;
+  },
+
+  finish: async (id: string): Promise<Stage> => {
+    const { data } = await api.patch<Stage>(
+      `/stages/${id}`,
+      {
+        status: 'TERMINE',
+      },
+    );
+
     return data;
   },
 

@@ -73,5 +73,12 @@ export const applicationService = {
   remove: async (id: string): Promise<Application> => {
     const response = await api.delete(`/applications/${id}`);
     return response.data;
-  }
+  },
+  select: async (id: string) => {
+  const { data } = await api.patch(
+    `/applications/${id}/select`,
+  );
+
+  return data;
+},
 };

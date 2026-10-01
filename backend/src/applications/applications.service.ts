@@ -272,4 +272,100 @@ export class ApplicationsService {
 
     throw new ForbiddenException('Accès refusé.');
   }
+  async selectApplication(id: string, user: any) {
+  const student = await this.prisma.student.findUnique({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  if (!student) {
+    throw new NotFoundException(
+      'Profil étudiant introuvable.',
+    );
+  }
+
+  const application = await this.prisma.application.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      internship: true,
+    },
+  });
+
+  if (!application) {
+    throw new NotFoundException(
+      'Candidature introuvable.',
+    );
+  }
+
+  if (application.studentId !== student.id) {
+    throw new ForbiddenException(
+      'Vous ne pouvez pas sélectionner cette candidature.',
+    );
+  }
+
+  if (application.status !== 'ACCEPTEE') {
+    throw new BadRequestException(
+      'Seule une candidature acceptée peut être sélectionnée.',
+    );
+  }
+
+  const existingStage =
+    await this.prisma.stage.findFirst({
+      where: {
+        studentId: student.id,
+        status: {
+          in: ['EN_ATTENTE', 'EN_COURS'],
+        },
+      },
+    });
+
+  if (existingStage) {
+    throw new BadRequestException(
+      'Vous avez déjà un stage actif.',
+    );
+  }
+
+  await this.prisma.application.updateMany({
+    where: {
+      studentId: student.id,
+      status: 'ACCEPTEE',
+    },
+    data: {
+      selectedForInternship: false,
+    },
+  });
+
+  await this.prisma.application.update({
+    where: {
+      id,
+    },
+    data: {
+      selectedForInternship: true,
+    },
+  });
+
+  return this.prisma.stage.create({
+    data: {
+      studentId: student.id,
+      internshipId: application.internshipId,
+      companyId: application.internship.companyId ?? undefined,
+      supervisorId:
+        application.internship.supervisorId ?? undefined,
+      startDate: application.internship.startDate,
+      endDate: application.internship.endDate,
+      status: 'EN_ATTENTE',
+      progression: 0,
+    },
+
+    include: {
+      student: true,
+      company: true,
+      supervisor: true,
+      internship: true,
+    },
+  });
+}
 }

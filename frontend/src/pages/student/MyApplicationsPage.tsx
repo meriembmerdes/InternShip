@@ -34,6 +34,28 @@ export default function MyApplicationsPage() {
         return status;
     }
   };
+  const handleSelectStage = async (id: string) => {
+  try {
+    setLoading(true);
+
+    await applicationService.select(id);
+
+    await loadApplications();
+
+    alert(
+      'Stage sélectionné avec succès. Vous pouvez maintenant commencer votre stage.',
+    );
+  } catch (error: any) {
+    console.error(error);
+
+    alert(
+      error?.response?.data?.message ||
+        'Impossible de sélectionner ce stage.',
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return (
@@ -135,6 +157,24 @@ export default function MyApplicationsPage() {
                     Voir l'offre
                   </Link>
                 </div>
+                {application.status === 'ACCEPTEE' && (
+  <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4">
+    <p className="font-medium text-green-800">
+      Votre candidature a été acceptée.
+    </p>
+
+    <p className="mt-1 text-sm text-green-700">
+      Vous pouvez sélectionner cette candidature pour commencer votre stage.
+    </p>
+
+    <button
+      onClick={() => handleSelectStage(application.id)}
+      className="mt-4 rounded-lg bg-green-600 px-5 py-2 text-white hover:bg-green-700"
+    >
+      Sélectionner ce stage
+    </button>
+  </div>
+)}
               </div>
             ))}
           </div>

@@ -4,6 +4,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { ApplicationsService } from './applications.service.js';
 import { CreateApplicationDto } from './dto/create-application.dto.js';
 import { UpdateApplicationStatusDto } from './dto/update-application-status.dto.js';
+import { Role } from '@prisma/client';
+import { Roles } from '../auth/roles.decorator.js';
 
 @ApiTags('applications')
 @ApiBearerAuth()
@@ -36,4 +38,15 @@ export class ApplicationsController {
   remove(@Req() req: any, @Param('id') id: string) {
     return this.applicationsService.remove(req.user.id, req.user.role, id);
   }
+  @Patch(':id/select')
+  @Roles(Role.STUDENT)
+  selectApplication(
+  @Param('id') id: string,
+  @Req() req: any,
+  ) {
+  return this.applicationsService.selectApplication(
+    id,
+    req.user,
+  );
+}
 }
