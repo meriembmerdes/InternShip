@@ -237,6 +237,7 @@ model Stage {
   supervisor   Supervisor?           @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
   internship   Internship            @relation(fields: [internshipId], references: [id], onDelete: Cascade)
   reports      Report[]
+  tasks        StageTask[]
   evaluations  CompanyEvaluation[]
   studentEval  StudentEvaluation[]
   supervisorEval SupervisorEvaluation[]
@@ -312,4 +313,22 @@ model Notification {
   createdAt DateTime        @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model StageTask {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus @default(A_FAIRE)
+
+  createdAt   DateTime   @default(now())
+  completedAt DateTime?
+
+  stageId     String
+  stage       Stage      @relation(fields: [stageId], references: [id], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  A_FAIRE
+  EN_COURS
+  TERMINEE
 }

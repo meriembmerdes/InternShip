@@ -1,32 +1,9 @@
 import { useEffect, useState } from 'react';
+import {
+  reportService,
+  type Report,
+} from '../../services/reportService';
 import api from '../../services/api';
-
-type ReportStatus =
-  | 'NON_DEPOSE'
-  | 'DEPOSE'
-  | 'EN_REVISION'
-  | 'VALIDE'
-  | 'REFUSE';
-
-interface Report {
-  id: string;
-  fileUrl: string;
-  submittedAt?: string;
-  status: ReportStatus;
-  comment?: string;
-
-  student?: {
-    firstName: string;
-    lastName: string;
-  };
-
-  stage?: {
-    internship?: {
-      title: string;
-      domain: string;
-    };
-  };
-}
 
 export default function SupervisorReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -39,10 +16,12 @@ export default function SupervisorReportsPage() {
       setLoading(true);
       setError('');
 
-      const { data } = await api.get<Report[]>('/reports');
+      const data = await reportService.getAll();
 
       setReports(data);
     } catch (err: any) {
+      console.error('Erreur chargement rapports:', err);
+
       setError(
         err?.response?.data?.message ||
           'Impossible de charger les rapports.',
@@ -51,6 +30,20 @@ export default function SupervisorReportsPage() {
       setLoading(false);
     }
   };
+  const handleOpenPdf = async (id: string) => {
+  try {
+    setError('');
+
+    await reportService.openFile(id);
+  } catch (error: any) {
+    console.error(error);
+
+    setError(
+      error?.response?.data?.message ||
+        'Impossible d’ouvrir le rapport PDF.',
+    );
+  }
+};
 
   useEffect(() => {
     void loadReports();
@@ -76,6 +69,8 @@ export default function SupervisorReportsPage() {
 
       await loadReports();
     } catch (err: any) {
+      console.error('Erreur modification statut:', err);
+
       setError(
         err?.response?.data?.message ||
           'Impossible de modifier le statut.',
@@ -83,46 +78,64 @@ export default function SupervisorReportsPage() {
     }
   };
 
-  const getStatusLabel = (status: ReportStatus) => {
+  const getStatusLabel = (
+    status: Report['status'],
+  ) => {
     switch (status) {
       case 'NON_DEPOSE':
         return 'Non déposé';
+
       case 'DEPOSE':
         return 'Déposé';
+
       case 'EN_REVISION':
         return 'En révision';
+
       case 'VALIDE':
         return 'Validé';
+
       case 'REFUSE':
         return 'Refusé';
+
       default:
         return status;
     }
   };
 
-  const getStatusClass = (status: ReportStatus) => {
+  const getStatusClass = (
+    status: Report['status'],
+  ) => {
     switch (status) {
       case 'VALIDE':
         return 'bg-green-100 text-green-700';
+
       case 'REFUSE':
         return 'bg-red-100 text-red-700';
+
       case 'EN_REVISION':
         return 'bg-blue-100 text-blue-700';
-      default:
+
+      case 'DEPOSE':
         return 'bg-yellow-100 text-yellow-700';
+
+      default:
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
   if (loading) {
     return (
       <div className="p-6">
-        Chargement des rapports...
+        <p className="text-gray-500">
+          Chargement des rapports...
+        </p>
       </div>
     );
   }
 
   return (
     <div className="p-6">
+      {/* HEADER */}
       <div className="mb-6">
         <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">
           Gestion des rapports
@@ -133,23 +146,26 @@ export default function SupervisorReportsPage() {
         </h1>
 
         <p className="mt-2 text-gray-500">
-          Consultez et validez les rapports des étudiants que
-          vous encadrez.
+          Consultez et validez les rapports des étudiants
+          que vous encadrez.
         </p>
       </div>
 
+      {/* MESSAGE SUCCÈS */}
       {message && (
         <div className="mb-4 rounded-lg bg-green-100 p-3 text-green-700">
           {message}
         </div>
       )}
 
+      {/* MESSAGE ERREUR */}
       {error && (
         <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
           {error}
         </div>
       )}
 
+      {/* RAPPORTS */}
       {reports.length === 0 ? (
         <div className="rounded-xl border bg-white p-8 text-center text-gray-500">
           Aucun rapport disponible.
@@ -161,6 +177,7 @@ export default function SupervisorReportsPage() {
               key={report.id}
               className="rounded-xl border bg-white p-6 shadow-sm"
             >
+              {/* INFORMATIONS */}
               <div className="flex flex-col justify-between gap-4 md:flex-row">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800">
@@ -174,12 +191,14 @@ export default function SupervisorReportsPage() {
                       'Stage non renseigné'}
                   </p>
 
-                  <p className="text-sm text-gray-400">
-                    {report.stage?.internship?.domain ||
-                      ''}
-                  </p>
+                  {report.stage?.internship?.domain && (
+                    <p className="text-sm text-gray-400">
+                      {report.stage.internship.domain}
+                    </p>
+                  )}
                 </div>
 
+                {/* STATUT */}
                 <span
                   className={`h-fit rounded-full px-3 py-1 text-sm font-medium ${getStatusClass(
                     report.status,
@@ -189,6 +208,7 @@ export default function SupervisorReportsPage() {
                 </span>
               </div>
 
+              {/* DATE */}
               <div className="mt-5">
                 <p className="text-sm text-gray-500">
                   Date de dépôt
@@ -203,16 +223,14 @@ export default function SupervisorReportsPage() {
                 </p>
               </div>
 
+              {/* ACTIONS */}
               <div className="mt-6 flex flex-wrap gap-3">
                 {report.fileUrl && (
-                  <a
-                    href={report.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
-                  >
-                    📄 Voir le PDF
-                  </a>
+                  <button
+                  type="button"
+                    onClick={() => void handleOpenPdf(report.id)}
+                  >📄 Voir le PDF
+                  </button>
                 )}
 
                 {(report.status === 'DEPOSE' ||
@@ -220,7 +238,10 @@ export default function SupervisorReportsPage() {
                   <>
                     <button
                       onClick={() =>
-                        updateStatus(report.id, 'VALIDE')
+                        updateStatus(
+                          report.id,
+                          'VALIDE',
+                        )
                       }
                       className="rounded-lg bg-green-600 px-5 py-2 text-white hover:bg-green-700"
                     >
@@ -229,7 +250,10 @@ export default function SupervisorReportsPage() {
 
                     <button
                       onClick={() =>
-                        updateStatus(report.id, 'REFUSE')
+                        updateStatus(
+                          report.id,
+                          'REFUSE',
+                        )
                       }
                       className="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700"
                     >
@@ -239,6 +263,7 @@ export default function SupervisorReportsPage() {
                 )}
               </div>
 
+              {/* COMMENTAIRE */}
               {report.comment && (
                 <div className="mt-5 rounded-lg bg-gray-50 p-4">
                   <p className="text-sm font-medium text-gray-500">

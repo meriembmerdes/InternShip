@@ -2837,3 +2837,431 @@ button.border:hover {
 .rounded-lg.bg-green-600:active {
   transform: translateY(0);
 }
+/* =========================
+   PAGE RAPPORTS SUPERVISEUR
+   ========================= */
+
+.p-6 {
+  padding: 24px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.mb-6 {
+  margin-bottom: 24px;
+}
+
+.text-sm {
+  font-size: 14px;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.tracking-wide {
+  letter-spacing: 0.05em;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.mt-1 {
+  margin-top: 4px;
+}
+
+.text-3xl {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+/* =========================
+   MESSAGES
+   ========================= */
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.rounded-lg {
+  border-radius: 10px;
+}
+
+.bg-green-100 {
+  background: #dcfce7;
+}
+
+.p-3 {
+  padding: 12px;
+}
+
+.text-green-700 {
+  color: #15803d;
+}
+
+.bg-red-100 {
+  background: #fee2e2;
+}
+
+.text-red-700 {
+  color: #b91c1c;
+}
+
+/* =========================
+   ÉTAT VIDE
+   ========================= */
+
+.rounded-xl {
+  border-radius: 16px;
+}
+
+.border {
+  border: 1px solid #e5e7eb;
+}
+
+.bg-white {
+  background: #ffffff;
+}
+
+.p-8 {
+  padding: 32px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* =========================
+   LISTE DES RAPPORTS
+   ========================= */
+
+.space-y-5 > * + * {
+  margin-top: 20px;
+}
+
+/* =========================
+   CARTE RAPPORT
+   ========================= */
+
+.rounded-xl.border.bg-white {
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.rounded-xl.border.bg-white:hover {
+  transform: translateY(-2px);
+  border-color: #d1d5db;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.09);
+}
+
+.shadow-sm {
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+/* =========================
+   INFORMATIONS
+   ========================= */
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.text-xl {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.text-xl.font-semibold {
+  margin: 0;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+
+/* =========================
+   STATUT
+   ========================= */
+
+.h-fit {
+  height: fit-content;
+}
+
+.rounded-full {
+  border-radius: 999px;
+}
+
+.px-3 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.py-1 {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.text-sm.font-medium {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bg-green-100.text-green-700 {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.bg-red-100.text-red-700 {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.bg-blue-100.text-blue-700 {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.bg-yellow-100.text-yellow-700 {
+  background: #fef3c7;
+  color: #a16207;
+}
+
+.bg-gray-100 {
+  background: #f3f4f6;
+}
+
+.bg-gray-100.text-gray-700 {
+  color: #374151;
+}
+
+/* =========================
+   DATE
+   ========================= */
+
+.mt-5 {
+  margin-top: 20px;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.mt-6 {
+  margin-top: 24px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.px-5 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.py-2 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+/* =========================
+   BOUTON VOIR PDF
+   ========================= */
+
+.mt-6 button[type='button'] {
+  border: none;
+  border-radius: 9px;
+  padding: 10px 20px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.mt-6 button[type='button']:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.22);
+}
+
+.mt-6 button[type='button']:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   BOUTON ACCEPTER
+   ========================= */
+
+.bg-green-600 {
+  background: #16a34a;
+}
+
+.bg-green-600:hover {
+  background: #15803d;
+}
+
+/* =========================
+   BOUTON REFUSER
+   ========================= */
+
+.bg-red-600 {
+  background: #dc2626;
+}
+
+.bg-red-600:hover {
+  background: #b91c1c;
+}
+
+/* Style commun des boutons d'action */
+.rounded-lg.bg-green-600,
+.rounded-lg.bg-red-600 {
+  border: none;
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.rounded-lg.bg-green-600:hover,
+.rounded-lg.bg-red-600:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+}
+
+.rounded-lg.bg-green-600:active,
+.rounded-lg.bg-red-600:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   COMMENTAIRE
+   ========================= */
+
+.bg-gray-50 {
+  background: #f9fafb;
+}
+
+.p-4 {
+  padding: 16px;
+}
+
+.bg-gray-50.p-4 {
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (min-width: 768px) {
+  .md\:flex-row {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 767px) {
+  .p-6 {
+    padding: 18px;
+  }
+
+  .text-3xl {
+    font-size: 25px;
+  }
+
+  .rounded-xl.border.bg-white {
+    padding: 18px;
+  }
+
+  .mt-6 button[type='button'],
+  .rounded-lg.bg-green-600,
+  .rounded-lg.bg-red-600 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .p-6 {
+    padding: 14px;
+  }
+
+  .text-3xl {
+    font-size: 23px;
+  }
+
+  .flex-wrap {
+    flex-direction: column;
+  }
+}

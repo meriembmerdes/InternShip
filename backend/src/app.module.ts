@@ -13,6 +13,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { ReportsModule } from './reports/reports.module.js';
 import { EvaluationsModule } from './evaluations/evaluations.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { TasksModule } from './tasks/tasks.module.js';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AdminModule } from './admin/admin.module.js';
     NotificationsModule,
     EvaluationsModule,
     AdminModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -17,6 +17,7 @@ export interface Report {
   comment?: string;
   createdAt: string;
   updatedAt: string;
+
   student?: {
     id: string;
     firstName: string;
@@ -36,12 +37,20 @@ export interface Report {
 
 export const reportService = {
   getAll: async (): Promise<Report[]> => {
-    const { data } = await api.get<Report[]>('/reports');
+    const { data } =
+      await api.get<Report[]>('/reports');
+
     return data;
   },
 
-  getById: async (id: string): Promise<Report> => {
-    const { data } = await api.get<Report>(`/reports/${id}`);
+  getById: async (
+    id: string,
+  ): Promise<Report> => {
+    const { data } =
+      await api.get<Report>(
+        `/reports/${id}`,
+      );
+
     return data;
   },
 
@@ -54,18 +63,61 @@ export const reportService = {
     formData.append('stageId', stageId);
     formData.append('file', file);
 
-    const { data } = await api.post<Report>(
-      '/reports',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+    const { data } =
+      await api.post<Report>(
+        '/reports',
+        formData,
+        {
+          headers: {
+            'Content-Type':
+              'multipart/form-data',
+          },
         },
-      },
-    );
+      );
 
     return data;
   },
+
+  /**
+   * Ouvre le PDF via la route sécurisée du backend.
+   */
+  openFile: async (id: string): Promise<void> => {
+  const newWindow = window.open('', '_blank');
+
+  if (!newWindow) {
+    throw new Error(
+      'Le navigateur a bloqué l’ouverture du PDF.',
+    );
+  }
+
+  try {
+    const response = await api.get(
+      `/reports/${id}/file`,
+      {
+        responseType: 'blob',
+      },
+    );
+
+    const blob = new Blob(
+      [response.data],
+      {
+        type: 'application/pdf',
+      },
+    );
+
+    const url =
+      window.URL.createObjectURL(blob);
+
+    newWindow.location.href = url;
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+    }, 60000);
+  } catch (error) {
+    newWindow.close();
+    throw error;
+  }
+},
 
   update: async (
     id: string,
@@ -74,30 +126,37 @@ export const reportService = {
       comment?: string;
     },
   ): Promise<Report> => {
-    const response = await api.patch<Report>(
-      `/reports/${id}`,
-      data,
-    );
+    const response =
+      await api.patch<Report>(
+        `/reports/${id}`,
+        data,
+      );
 
     return response.data;
   },
 
-  remove: async (id: string): Promise<void> => {
-    await api.delete(`/reports/${id}`);
+  remove: async (
+    id: string,
+  ): Promise<void> => {
+    await api.delete(
+      `/reports/${id}`,
+    );
   },
-  updateStatus: async (
-  id: string,
-  status: ReportStatus,
-  comment?: string,
-): Promise<Report> => {
-  const { data } = await api.patch<Report>(
-    `/reports/${id}/status`,
-    {
-      status,
-      comment,
-    },
-  );
 
-  return data;
-},
+  updateStatus: async (
+    id: string,
+    status: ReportStatus,
+    comment?: string,
+  ): Promise<Report> => {
+    const { data } =
+      await api.patch<Report>(
+        `/reports/${id}/status`,
+        {
+          status,
+          comment,
+        },
+      );
+
+    return data;
+  },
 };

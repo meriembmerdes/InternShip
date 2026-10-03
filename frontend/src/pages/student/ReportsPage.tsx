@@ -297,14 +297,14 @@ export default function ReportsPage() {
                 )}
 
                 <div className="mt-5">
-                  <a
-                    href={report.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                  <button
+                  type="button"
+                  onClick={() =>
+                  void reportService.openFile(report.id)}
+                  className="inline-flex rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
                   >
-                    Consulter le rapport PDF
-                  </a>
+                  Consulter le rapport PDF
+                  </button>
                 </div>
               </div>
             ))}

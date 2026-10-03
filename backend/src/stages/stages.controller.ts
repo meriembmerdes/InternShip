@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { Roles } from '../auth/roles.decorator.js';
 
 import { StagesService } from './stages.service.js';
+
 import { CreateStageDto } from './dto/create-stage.dto.js';
 import { UpdateStageDto } from './dto/update-stage.dto.js';
 
@@ -31,7 +32,7 @@ export class StagesController {
   ) {}
 
   @Post()
-  @Roles(Role.STUDENT)
+  @Roles(Role.ADMIN, Role.SUPERVISOR, Role.COMPANY)
   create(
     @Body() dto: CreateStageDto,
     @Req() req: any,
@@ -49,8 +50,10 @@ export class StagesController {
     Role.SUPERVISOR,
     Role.COMPANY,
   )
-  findAll() {
-    return this.stagesService.findAll();
+  findAll(@Req() req: any) {
+    return this.stagesService.findAll(
+      req.user,
+    );
   }
 
   @Get(':id')
@@ -62,14 +65,17 @@ export class StagesController {
   )
   findOne(
     @Param('id') id: string,
+    @Req() req: any,
   ) {
-    return this.stagesService.findOne(id);
+    return this.stagesService.findOne(
+      id,
+      req.user,
+    );
   }
 
   @Patch(':id')
   @Roles(
     Role.ADMIN,
-    Role.STUDENT,
     Role.SUPERVISOR,
     Role.COMPANY,
   )
@@ -91,5 +97,38 @@ export class StagesController {
     @Param('id') id: string,
   ) {
     return this.stagesService.remove(id);
+  }
+
+  @Patch(':id/start')
+  @Roles(
+    Role.ADMIN,
+    Role.SUPERVISOR,
+    Role.COMPANY,
+  )
+  start(
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    return this.stagesService.start(
+      id,
+      req.user,
+    );
+  }
+
+  @Patch(':id/finish')
+  @Roles(
+    Role.ADMIN,
+    Role.STUDENT,
+    Role.SUPERVISOR,
+    Role.COMPANY,
+  )
+  finish(
+    @Param('id') id: string,
+    @Req() req: any,
+  ) {
+    return this.stagesService.finish(
+      id,
+      req.user,
+    );
   }
 }
